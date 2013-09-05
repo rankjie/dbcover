@@ -6,6 +6,7 @@ class Field
     @column = attrs.column ? @name
     @validator = attrs.validator ? null
     @required = attrs.required ? false
+    @primkey  = attrs.primkey ? false
 
   say: ->
     console.log '喵'

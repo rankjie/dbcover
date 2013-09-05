@@ -1,28 +1,63 @@
-{toType} = require './utils'
-Validators = {}
+{toType}  = require './utils'
+{check}   = require 'validator'
 
-Validators['integer'] = class IntegerValidator
+
+class Validator
+   constructor: ->
+     @result = {}
+
+Validators = {}
+Validators.integer = class IntegerValidator extends Validator
   constructor: (min, max)->
     @min = min
     @max = max
 
   doValidate: (num)->
-    return true if num >= @min and num <=@max and toType(num) is 'number'
-    return false
+    try
+      check(num).isInt().max(@max).min(@min)
+      @result.okay = true
+    catch e
+      @result.error = e
+    return @result
 
-Validators['string'] = class StringValidator
+Validators.string = class StringValidator extends Validator
   constructor: (minx, max) ->
     @min = min
     @max = max
 
   doValidate: (str)->
-    return true if str.length >= @min and str.length <=@max and toType(str) is 'string'
-    console.log 'string, 验证失败'
-    return false
+    try
+      check(num).len(@min, @max)
+      @result.okay = true
+    catch e
+      @result.error = e
+    return @result
 
-Validators['email'] = class EmailValidator
+Validators.email = class EmailValidator extends Validator
   constructor: ->
 
-  doValidate: ->
+  doValidate: (str)->
+    try
+      check(str).isEmail()
+      @result.okay = true
+    catch e
+      @result.error = e
+    return @result
+      
 
-exports.Validators = Validators
+Validators.required = class NullValidator extends Validator
+  constructor: ->
+
+  doValidate: (str)->
+    try
+      check(str).isNull()
+      @result.okay = true
+    catch e
+      @result.error = e
+    return @result
+    
+
+exports.Validators       = Validators
+exports.IntegerValidator = IntegerValidator
+exports.StringValidator  = StringValidator
+exports.EmailValidator   = EmailValidator

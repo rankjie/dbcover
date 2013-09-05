@@ -12,7 +12,6 @@ class Instance
     @$db          = db
     @$cache       = cache
 
-
     for name, field of @$nameToField
       # 按照name把键值都存下来，只能透过name访问，不能直接用column来访问
       # 同时也把这个初始值存到field里面，update的时候就能用了
@@ -22,14 +21,23 @@ class Instance
     for method in userDefineMethods
       Instance.prototype[method.name] = method.body
   
-
   save: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
-    return queryTable.save(@) if @validate()
+    result = @validate()
+    if result.okay
+      return queryTable.save(@) 
+    else
+      deferred = Q.defer()
+      deferred.reject result.error
 
   update: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
-    return queryTable.update(@) if @validate()
+    result = @validate()
+    if result.okay
+      return queryTable.update(@) 
+    else
+      deferred = Q.defer()
+      deferred.reject result.error
 
   delete: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
@@ -39,14 +47,14 @@ class Instance
   validate: ->
     for index in @$pks
       for name in index.fields
-        return false if @[name] is null
+        return false if not @[name]?
 
     for name, field of @$nameToField
-      return false if field.required and @[name] is null
+      return false if (field.required or field.primkey) and not @[name]?
       # validator是string的话。例如'email'
       if field.validator?
         if toType(field.validator) is 'string'
-          return (new Validators field.validator ).doValidate @[name]
+          return (new Validators[field.validator]).doValidate @[name]
         else
           return field.validator.doValidate @[name]
 

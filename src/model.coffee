@@ -1,10 +1,11 @@
-{createField} = require './field'
-_             = require 'lodash'
-db            = require './db/db'
-cache         = require './cache/cache'
-Instance      = require './instance'
-QueryTable    = require './querytable'
-{toType}      = require './utils'
+_                  = require 'lodash'
+{toType}           = require './utils'
+{createField}      = require './field'
+db                 = require './db/db'
+cache              = require './cache/cache'
+Instance           = require './instance'
+QueryTable         = require './querytable'
+{StringValidator, IntegerValidator, EmailValidator}  = require './validators'
 
 repoGroup  = {}
 cacheGroup = {}
@@ -66,16 +67,36 @@ class Model
           name: k
           body: v
 
+    # 集合需要实现findBy的primkey
+    primkeys = []
+    for f in dataDefine.meta.fields when f.primkey?
+      key = f.name
+      keyName = []
+      keyName.push f.name
+
+      primkeys.push
+        name   : f.name
+        keyName: keyName
+
+    for f in dataDefine.meta.indices
+      if toType f.fields is 'array'
+        keyName = f.fields
+      else
+        keyName = []
+        keyName.push index.fields
+      primkeys.push
+        name   : f.name
+        keyName: keyName
+    
     # 实现findByIndex
-    @$sql_findBy = {}
-    for index in @$indices
-      Model.prototype['findBy'+index.name] = Model.prototype['findBy'+index.fields] = (value) ->
-        str = []
-        for f, i in index.fields
-          str.push "#{@$nameToField[f].column} = #{value[i]}"
-        Model.prototype.find str.join(' AND ')
-
-
+    for key in primkeys
+      Model.prototype['findBy_'+key.name] = (values) ->
+        sqlStr = []
+        for name in key.keyName
+          sqlStr.push "#{@$nameToField[name].column} = #{@$nameToField[name].toDB values[name]}"
+        console.log sqlStr.join(' AND ')
+        @find sqlStr.join(' AND ')
+    
   # 生产instance
   # User.new
   new: (vals)->

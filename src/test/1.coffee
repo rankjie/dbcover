@@ -53,7 +53,6 @@ User = new Model
     console.log 'hi'
 
 u = User.new 
-  userId: 88
   name:   '一号测试人员'
   age:    99
 
