@@ -1,7 +1,18 @@
 # A Simple ORM Module
+
+Install:
+`npm install dbcover`
+
+
+Usage:
+
 ```coffeescript
+{Obeserve}          = require 'dbcover'
+{Model}             = require 'dbcover'
+{IntegerValidator}  = require('dbcover').Validator
+
 # Define database connection
-Discover.define 'repo',
+Observe.define 'repo',
   name: 'default'
   provider:
     type: 'mysql'
@@ -12,7 +23,7 @@ Discover.define 'repo',
       user: 'root'
       database: 'test'
       
-Discover.define 'repo',
+Observe.define 'repo',
   name: 'pg'
   provider:
     type: 'postgresql'
@@ -23,7 +34,7 @@ Discover.define 'repo',
       user: 'root'
       database: 'test'
 
-Discover.define 'cache',
+Observe.define 'cache',
   name: 'default'
   provider:
     type: 'redis'
@@ -40,7 +51,7 @@ User = new Model
     fields: [
       {name: 'userId',  type: 'string', column: 'user_id', required: true}
       {name: 'email',   type: 'string', validator: 'email'}
-      {name: 'age',     type: 'integer', validator: new Validators.integer(10, 100)}
+      {name: 'age',     type: 'integer', validator: new IntegerValidator(10, 100)}
       {name: 'extra',   type: 'json'}
       {name: 'created', type: 'timestamp'}
       {name: 'examplePrimkey', type: 'string', primkey: true}
