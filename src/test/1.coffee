@@ -53,17 +53,19 @@ User = new Model
     console.log 'hi'
 
 u = User.new 
-  userId: 801
-  name:   '二号测试人员'
-  age:    98
+  userId: 802
+  name:   '111号测试人员'
+  age:    99
 
 u.sayHi()
 
 promise = u.save()
 
-u.age = 2
+u.age = 3
 
-promise1 = u.delete()
+u.update()
+
+# promise1 = u.delete()
 
 # console.log u
 

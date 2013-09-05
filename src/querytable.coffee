@@ -65,7 +65,11 @@ class QueryTable
   update: (obj) ->
     @_queryType = 'update'
     @_fieldsToUpdate = []
-    @_deleteKey = 
+    @pkStr = []
+    for k in obj.$primkeys
+      for name in k.keyName
+        console.log name
+        @pkStr.push obj.$nameToField[name].column + ' = ' + obj.$nameToField[name].val
     # 找出需要做update的数据
     for name, field of obj.$nameToField when obj[name] isnt field.val
       # 更新field.val为最新的值
@@ -81,7 +85,6 @@ class QueryTable
   delete: (obj)->
     @_queryType = 'delete'
     @pkStr = []
-    console.log obj.$nameToField
     for k in obj.$primkeys
       for name in k.keyName
         # 因为instance可能在delete之前有修改过变量值，但是没有update。这时候数据库的数据是老的，所以要用
@@ -115,6 +118,8 @@ class QueryTable
       sql = sqlbuilder.update().table(@table)
       for f in @_fieldsToUpdate
         sql = sql.set f.column, f.value
+      for str in @pkStr
+        sql = sql.where(str)
 
 
     else if @_queryType is 'insert'
