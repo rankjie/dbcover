@@ -44,7 +44,6 @@ Validators.email = class EmailValidator extends Validator
       @result.error = e
     return @result
       
-
 Validators.required = class NullValidator extends Validator
   constructor: ->
 

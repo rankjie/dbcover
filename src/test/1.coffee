@@ -53,15 +53,30 @@ User = new Model
     console.log 'hi'
 
 u = User.new 
+  userId: 800
   name:   '一号测试人员'
   age:    99
 
 u.sayHi()
 
+# console.log u
+
+User.findBy_id(userId:800)
+.then (u) ->
+  console.log 'yesssssss'
+  # console.log u[0]
+  uu = u[0]
+  uu.name = '哈哈哈哈p'
+  console.log uu
+  uu.update()
+  
+, (err) ->
+  console.log ':('
+
 # Observe.listAll()
 # console.log u
 
-u.save()
+# u.save()
 # u.$cache.set 'abc', '123'
 
 

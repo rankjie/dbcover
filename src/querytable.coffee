@@ -2,8 +2,10 @@ logger        = require 'node-simple-logger'
 sqlbuilder    = require 'squel'
 _             = require 'lodash'
 Q             = require 'q'
+{toType}      = require './utils'
+
 replace_char = '?'
-prefix = ':'
+prefix       = ':'
 
 defaultTTL = 60
 
@@ -86,8 +88,8 @@ class QueryTable
   toSQL: ->
     if @_queryType is 'find'
       sql = sqlbuilder.select().from(@table)
-      for f in @fields
-        sql = sql.field(f.column, f.name)
+      for name, field of @nameToField
+        sql = sql.field(field.column, name)
 
       if toType(@_inputRawSQL) is 'string'
         sql = sql.where(@_inputRawSQL)
@@ -98,7 +100,7 @@ class QueryTable
           # userId并不一定是column name，所以要转换一下
           sql = sql.where(@nameToField[k].column + '=' + @nameToField[k].toDB v)
 
-      if @_orderBy.length > 0
+      if @_orderBy? and @_orderBy.length > 0
         for f,i in @_orderBy
           sql = sql.order f, @_order[i]
 
@@ -130,7 +132,7 @@ class QueryTable
         sql = sql.replace prefix+k, "#{v}"
 
 
-    console.log sql.toString()
+    console.log '最后的查询sql：'+sql.toString()
     return sql.toString()
 
   query: () ->
@@ -139,9 +141,11 @@ class QueryTable
     sql = self.toSQL()
 
     cacheToInstance = (data) ->
+      # console.log data
       return dbToInstance JSON.parse data
 
     instanceToCache = (obj) ->
+      # console.log obj.$cacheData
       return JSON.stringify obj.$cacheData
 
     dbToInstance = (rows) ->
@@ -158,14 +162,17 @@ class QueryTable
       self.cache.get sql, (err, data) ->
         # 出错
         deferred.reject err if err
-        # cache没有的话
-        unless data?
+        console.log 'cache查到了：'
+        if _.isEmpty data then console.log '空的' else console.log data
+        # cache没有
+        if _.isEmpty(data)
+          console.log '去DB查！'
           # 从db查
           self.db.query sql, (err, rows) ->
             if err
               deferred.reject err
               return deferred.promise
-            self.cache.set sql, JSON.stringify rows, (err, response) ->
+            self.cache.set sql, JSON.stringify(rows), (err, response) ->
               # 把data变成object再返回
               deferred.resolve dbToInstance rows
         # cache有的话
@@ -201,6 +208,7 @@ class QueryTable
           deferred.reject err if err
           deferred.resolve null
 
+    return deferred.promise
   cacheKey: (obj) ->
     key = "#{@table}:"
     for k in obj.$pks

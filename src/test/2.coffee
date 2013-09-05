@@ -1,4 +1,5 @@
 {check}   = require 'validator'
+pg        = require 'pg'
 
 try
   check('ab123').len(2,3)

@@ -79,7 +79,7 @@ class Model
         keyName: keyName
 
     for f in dataDefine.meta.indices
-      if toType f.fields is 'array'
+      if toType(f.fields) is 'array'
         keyName = f.fields
       else
         keyName = []
@@ -91,12 +91,15 @@ class Model
     # 实现findByIndex
     for key in primkeys
       Model.prototype['findBy_'+key.name] = (values) ->
+        if toType(values) isnt 'object'
+          values = {}
+          values[key.name] = values
         sqlStr = []
         for name in key.keyName
-          sqlStr.push "#{@$nameToField[name].column} = #{@$nameToField[name].toDB values[name]}"
-        console.log sqlStr.join(' AND ')
-        @find sqlStr.join(' AND ')
-    
+          sqlStr.push "#{@$nameToField[name].column} = #{values[name]}"
+        console.log 'findBy产生的sql条件：'+sqlStr.join(' AND ')
+        return @find(sqlStr.join(' AND ')).first()
+      
   # 生产instance
   # User.new
   new: (vals)->
