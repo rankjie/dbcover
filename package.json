@@ -1,0 +1,26 @@
+{
+  "name": "dbcover",
+  "version": "0.0.1",
+  "description": "Object Relational Mapping With Cache(Memcached/Redis) Enabled For Mysql/PostgreSQL/more.",
+  "main": "observe.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "orm",
+    "cache"
+  ],
+  "author": "Leijie Hou",
+  "license": "BSD",
+  "dependencies": {
+    "pg":"*",
+    "mysql":"*",
+    "q":"*",
+    "squel":"*",
+    "memcached":"*",
+    "node-simple-logger":"*",
+    "lodash":"*",
+    "redis":"*"
+  }
+}
