@@ -1,14 +1,10 @@
 {toType}  = require './utils'
 {check}   = require 'validator'
 
-
-class Validator
-   constructor: ->
-     @result = {}
-
 Validators = {}
-Validators.integer = class IntegerValidator extends Validator
+Validators.integer = class IntegerValidator
   constructor: (min, max)->
+    @result = {}
     @min = min
     @max = max
 
@@ -20,8 +16,9 @@ Validators.integer = class IntegerValidator extends Validator
       @result.error = e
     return @result
 
-Validators.string = class StringValidator extends Validator
+Validators.string = class StringValidator
   constructor: (minx, max) ->
+    @result = {}
     @min = min
     @max = max
 
@@ -33,8 +30,9 @@ Validators.string = class StringValidator extends Validator
       @result.error = e
     return @result
 
-Validators.email = class EmailValidator extends Validator
+Validators.email = class EmailValidator
   constructor: ->
+    @result = {}
 
   doValidate: (str)->
     try
@@ -44,8 +42,9 @@ Validators.email = class EmailValidator extends Validator
       @result.error = e
     return @result
       
-Validators.required = class NullValidator extends Validator
+Validators.required = class NullValidator
   constructor: ->
+    @result = {}
 
   doValidate: (str)->
     try

@@ -4,13 +4,14 @@ _             = require 'lodash'
 QueryTable    = require './querytable'
 
 class Instance
-  constructor: (table, pks, nameToField , vals, db, cache, userDefineMethods) ->
+  constructor: (table, pks, nameToField , vals, db, cache, userDefineMethods, primkeys) ->
     # console.log arguments
     @$table       = table
     @$pks         = _.cloneDeep pks
     @$nameToField = _.cloneDeep nameToField
     @$db          = db
     @$cache       = cache
+    @$primkeys    = primkeys
 
     for name, field of @$nameToField
       # 按照name把键值都存下来，只能透过name访问，不能直接用column来访问

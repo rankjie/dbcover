@@ -46,32 +46,26 @@ User = new Model
       {name: 'age',     type: 'integer',  validator: new Validators.integer(1, 100)}
     ]
     indices: [
-      {name: 'id',    fields: ['userId'], unique: true}
+      {name: 'id',    fields: ['userId', 'age'], unique: true}
     ]
 
   sayHi: () ->
     console.log 'hi'
 
 u = User.new 
-  userId: 800
-  name:   '一号测试人员'
-  age:    99
+  userId: 801
+  name:   '二号测试人员'
+  age:    98
 
 u.sayHi()
 
-# console.log u
+promise = u.save()
 
-User.findBy_id(userId:800)
-.then (u) ->
-  console.log 'yesssssss'
-  # console.log u[0]
-  uu = u[0]
-  uu.name = '哈哈哈哈p'
-  console.log uu
-  uu.update()
-  
-, (err) ->
-  console.log ':('
+u.age = 2
+
+promise1 = u.delete()
+
+# console.log u
 
 # Observe.listAll()
 # console.log u

@@ -68,13 +68,13 @@ class Model
           body: v
 
     # 集合需要实现findBy的primkey
-    primkeys = []
+    @primkeys = []
     for f in dataDefine.meta.fields when f.primkey?
       key = f.name
       keyName = []
       keyName.push f.name
 
-      primkeys.push
+      @primkeys.push
         name   : f.name
         keyName: keyName
 
@@ -84,12 +84,12 @@ class Model
       else
         keyName = []
         keyName.push index.fields
-      primkeys.push
+      @primkeys.push
         name   : f.name
         keyName: keyName
     
     # 实现findByIndex
-    for key in primkeys
+    for key in @primkeys
       Model.prototype['findBy_'+key.name] = (values) ->
         if toType(values) isnt 'object'
           values = {}
@@ -103,7 +103,7 @@ class Model
   # 生产instance
   # User.new
   new: (vals)->
-    new Instance @$table, @$indices, @$nameToField, vals, @$repo, @$cache, @$userDefineMethods
+    new Instance @$table, @$indices, @$nameToField, vals, @$repo, @$cache, @$userDefineMethods, @primkeys
 
   find: (rawSQL, condition) ->
     # 同new

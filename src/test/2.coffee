@@ -6,6 +6,16 @@ try
   console.log 'ababsd'
 catch e
   console.log e
+
+
+
+a= 
+  name: 'papap'
+  age:  123
+for k, v of a
+  console.log k
+  console.log v
+
   # console.log
 
 # {toType} = require '../utils'

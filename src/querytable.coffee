@@ -65,7 +65,7 @@ class QueryTable
   update: (obj) ->
     @_queryType = 'update'
     @_fieldsToUpdate = []
-
+    @_deleteKey = 
     # 找出需要做update的数据
     for name, field of obj.$nameToField when obj[name] isnt field.val
       # 更新field.val为最新的值
@@ -81,8 +81,12 @@ class QueryTable
   delete: (obj)->
     @_queryType = 'delete'
     @pkStr = []
-    for k in obj.$pks
-      @pkStr.push k.fields[0] + ' = ' + obj[k.name]
+    console.log obj.$nameToField
+    for k in obj.$primkeys
+      for name in k.keyName
+        # 因为instance可能在delete之前有修改过变量值，但是没有update。这时候数据库的数据是老的，所以要用
+        # nameToField里面存的变量（用于在update的时候找出需要做set的column）
+        @pkStr.push obj.$nameToField[name].column + ' = ' + obj.$nameToField[name].val
     @query()
 
   toSQL: ->
@@ -112,6 +116,7 @@ class QueryTable
       for f in @_fieldsToUpdate
         sql = sql.set f.column, f.value
 
+
     else if @_queryType is 'insert'
       sql = sqlbuilder.insert().into(@table)
       for f in @_fieldsToInsert
@@ -123,6 +128,8 @@ class QueryTable
       for str in @pkStr
         # 为什么indices的field是array？pk对应多个fields？
         sql = sql.where(str)
+
+
 
     if @_condition?
       for i in [0...sql.match(/\?/g).length] by 1
@@ -209,10 +216,12 @@ class QueryTable
           deferred.resolve null
 
     return deferred.promise
+
   cacheKey: (obj) ->
     key = "#{@table}:"
-    for k in obj.$pks
-      key += obj[k] + ':'
+    for k in obj.$primkeys
+      for keyname in k.keyName
+        key += obj[keyname] + ':'
     return key.slice 0, -1
 
 module.exports = QueryTable
