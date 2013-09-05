@@ -198,7 +198,7 @@ class QueryTable
       # 存入db
       self.db.query sql, (err, rows) ->
         deferred.reject err if err
-        deferred.resolve null unless self.cache
+        deferred.resolve rows unless self.cache
         # 存入cache
         self.cache.set self._cachekey, JSON.stringify self._cacheData, defaultTTL, (err, response) ->
           deferred.reject err if err

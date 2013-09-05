@@ -73,19 +73,19 @@ user = User.new
 
 promise = user.save()
 
-# Updating attributes
+# Updating attributes [DONE]
 user.age = 31
 user.extra = { nick: 'zola' }
 promise = user.update()
 
-# Deleting instance
+# Deleting instance [DONE]
 promise = user.delete()
 
-# Query
+# Query [NEED TEST]
 promise = User.find(userId: 123).first()
 promise = User.find(age: 30, created__gt: 2334343).first()
 
-# Find by primkeys
+# Find by primkeys [NEED TEST]
 promise = User.findBy_pk(userID: 234, age: 99)
 promise = User.findBy_examplePrimkey('someValue')
 
