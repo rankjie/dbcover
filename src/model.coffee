@@ -89,17 +89,21 @@ class Model
         keyName: keyName
     
     # 实现findByIndex
+    capitaliseFirstLetter = (str) ->
+      return str.charAt(0).toUpperCase() + str.slice(1)
+
     for key in @primkeys
-      Model.prototype['findBy_'+key.name] = (values) ->
-        if toType(values) isnt 'object'
-          values = {}
-          values[key.name] = values
-        sqlStr = []
-        for name in key.keyName
-          sqlStr.push "#{@$nameToField[name].column} = #{values[name]}"
-        console.log 'findBy产生的sql条件：'+sqlStr.join(' AND ')
-        return @find(sqlStr.join(' AND ')).first()
-      
+      ( (key)->
+          Model.prototype['findBy'+capitaliseFirstLetter(key.name)] = (v)->
+            if toType(values) isnt 'object'
+              values = {}
+              values[key.name] = v
+            sqlStr = []
+            for name in key.keyName
+              sqlStr.push @$nameToField[name].column + ' = ' + @$nameToField[name].toDB values[name]
+            return @find(sqlStr.join(' AND ')).all()
+      )(key)
+
   # 生产instance
   # User.new
   new: (vals)->

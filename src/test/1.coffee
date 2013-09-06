@@ -41,7 +41,7 @@ User = new Model
     repo: 'mysql'   # default repo name is 'default'
     cache: 'default' # set to false to disable caching
     fields: [
-      {name: 'userId',  type: 'string',   column:    'id', required: true}
+      {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
       {name: 'name',    type: 'string',   validator: null}
       {name: 'age',     type: 'integer',  validator: new Validators.integer(1, 100)}
     ]
@@ -52,18 +52,19 @@ User = new Model
   sayHi: () ->
     console.log 'hi'
 
-u = User.new 
-  userId: 802
-  name:   '111号测试人员'
-  age:    99
+# u = User.new 
+#   userId: 808
+#   name:   '111号测试人员'
+#   age:    99
 
-u.sayHi()
+User.findByUserId(83)
+.then (u) ->
+  console.log '---------------------------'
+  console.log u
+, (err) ->
+  console.log err
 
-promise = u.save()
-
-u.age = 3
-
-u.update()
+# u.update()
 
 # promise1 = u.delete()
 

@@ -35,6 +35,9 @@ class QueryTable
     @_order.push _order
     return @
 
+  all: ->
+    @list 0, 0
+
   first: ->
     @list 0, 1
 
@@ -103,16 +106,26 @@ class QueryTable
       else if toType(@_inputRawSQL) is 'object'
         for k, v of @_inputRawSQL
           # 传入的参数
-          # userId: 123
-          # userId并不一定是column name，所以要转换一下
-          sql = sql.where(@nameToField[k].column + '=' + @nameToField[k].toDB v)
+          # userId: 123  或者  userId__gt: 123
+          # userId并不是column name，所以要转换一下
+          operators = 
+            '__gt' : ' > '
+            '__lt' : ' < '
+          opkey = k.slice(k.length-4, k.length)
+          if opkey not in ['__gt', '__lt']
+            operator = ' = '
+            columnName = k
+          else
+            operator = operators[opkey]
+            columnName = k.slice(0, k.length-4)
+          sql = sql.where(@nameToField[columnName].column + operator + @nameToField[columnName].toDB v)
 
       if @_orderBy? and @_orderBy.length > 0
         for f,i in @_orderBy
           sql = sql.order f, @_order[i]
 
-      sql = sql.limit(@_limit) if @_limit
-      sql = sql.offset(@_offset) if @_offset
+      sql = sql.limit(@_limit) if @_limit? and @_limit isnt 0
+      sql = sql.offset(@_offset) if @_offset?
     
     else if @_queryType is 'update'
       sql = sqlbuilder.update().table(@table)
@@ -147,7 +160,9 @@ class QueryTable
     console.log '最后的查询sql：'+sql.toString()
     return sql.toString()
 
-  query: () ->
+  # deferred.reject err if err 需要改一下。
+  # 因为err了就不用后面的操作了，直接return吧
+  query: () ->  
     self = @
     deferred = Q.defer()
     sql = self.toSQL()
@@ -191,18 +206,21 @@ class QueryTable
         else
           deferred.resolve cacheToInstance data[sql]
 
-
     # insert类型
     if self._queryType is 'insert'
       
       # 存入db
       self.db.query sql, (err, rows) ->
-        deferred.reject err if err
-        deferred.resolve rows unless self.cache
-        # 存入cache
-        self.cache.set self._cachekey, JSON.stringify self._cacheData, defaultTTL, (err, response) ->
-          deferred.reject err if err
-          deferred.resolve null
+        if err
+          deferred.reject err
+          return deferred.promise
+        if self.cache
+          # 存入db
+          self.cache.set self._cachekey, JSON.stringify self._cacheData, defaultTTL, (err, response) ->
+            deferred.reject err if err
+            deferred.resolve null
+        else
+          deferred.resolve rows
 
     # update类型，更新完db后从cache里删除该对象数据
     if self._queryType is 'delete'

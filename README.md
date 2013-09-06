@@ -84,10 +84,11 @@ promise = user.delete()
 # Query [NEED TEST]
 promise = User.find(userId: 123).first()
 promise = User.find(age: 30, created__gt: 2334343).first()
+promise = User.find(age: 30).all()
 
 # Find by primkeys [NEED TEST]
-promise = User.findBy_pk(userID: 234, age: 99)
-promise = User.findBy_examplePrimkey('someValue')
+promise = User.findByPk(userID: 234, age: 99)
+promise = User.findByExamplePrimkey('someValue')
 
 
 

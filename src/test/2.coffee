@@ -1,25 +1,11 @@
-{check}   = require 'validator'
-pg        = require 'pg'
+class User
+  constructor: (byWhat)->
+    for key in byWhat
 
-try
-  check('ab123').len(2,3)
-  console.log 'ababsd'
-catch e
-  console.log e
+      User.prototype[key] = ()->
+        
+
+u = new User ['a','b']
 
 
-
-a= 
-  name: 'papap'
-  age:  123
-for k, v of a
-  console.log k
-  console.log v
-
-  # console.log
-
-# {toType} = require '../utils'
-
-# a  = ([].push 'asd').push 'aaaaa'
-# console.log a
-# console.log toType(a)
+u.prototype.key()
