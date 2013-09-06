@@ -5,7 +5,7 @@ Install:
 (not done yet.)
 
 
-Usage:
+Usage (in coffeescript):
 
 ```coffeescript
 {Obeserve}          = require 'dbcover'
@@ -107,3 +107,151 @@ promise = User.find('age > :age and created > :created')
   .orderBy('created', 'desc')
   .list(0, 10)
 ```
+
+
+
+
+
+Usage (in javascript):
+
+```javascript
+var IntegerValidator, Model, Obeserve, User, promise, user;
+
+  Obeserve = require('dbcover').Obeserve;
+
+  Model = require('dbcover').Model;
+
+  IntegerValidator = require('dbcover').Validator.IntegerValidator;
+
+  Observe.define('repo', {
+    name: 'default',
+    provider: {
+      type: 'mysql',
+      options: {
+        host: 'localhost',
+        port: 3306,
+        password: '123123',
+        user: 'root',
+        database: 'test'
+      }
+    }
+  });
+
+  Observe.define('repo', {
+    name: 'pg',
+    provider: {
+      type: 'postgresql',
+      options: {
+        host: 'localhost',
+        port: 3306,
+        password: '123123',
+        user: 'root',
+        database: 'test'
+      }
+    }
+  });
+
+  Observe.define('cache', {
+    name: 'default',
+    provider: {
+      type: 'redis',
+      options: {
+        host: 'localhost',
+        port: 6379
+      }
+    }
+  });
+
+  User = new Model({
+    meta: {
+      table: 'users',
+      repo: 'pg',
+      cache: 'default',
+      fields: [
+        {
+          name: 'userId',
+          type: 'string',
+          column: 'user_id',
+          required: true
+        }, {
+          name: 'email',
+          type: 'string',
+          validator: 'email'
+        }, {
+          name: 'age',
+          type: 'integer',
+          validator: new IntegerValidator(10, 100)
+        }, {
+          name: 'extra',
+          type: 'json'
+        }, {
+          name: 'created',
+          type: 'timestamp'
+        }, {
+          name: 'examplePrimkey',
+          type: 'string',
+          primkey: true
+        }
+      ],
+      indices: [
+        {
+          name: 'pk',
+          fields: ['userId', 'age'],
+          unique: true
+        }, {
+          name: 'email',
+          fields: 'email',
+          unique: true
+        }
+      ]
+    },
+    sayHi: function() {
+      return console.log('hi');
+    }
+  });
+
+  user = User["new"]({
+    userId: 23,
+    email: 'zolazhou@gmail.com',
+    age: 30
+  });
+
+  promise = user.save();
+
+  user.age = 31;
+
+  user.extra = {
+    nick: 'zola'
+  };
+
+  promise = user.update();
+
+  promise = user["delete"]();
+
+  promise = User.find({
+    userId: 123
+  }).first();
+
+  promise = User.find({
+    age: 30,
+    created__gt: 2334343
+  }).first();
+
+  promise = User.find({
+    age: 30
+  }).all();
+
+  promise = User.findByPk({
+    userID: 234,
+    age: 99
+  });
+
+  promise = User.findByExamplePrimkey('someValue');
+
+  promise = User.find('age > ? and created > ?', [30, 234242]).orderBy('created', 'desc').list(0, 10);
+
+  promise = User.find('age > :age and created > :created').set({
+    age: 30,
+    created: 1234324234
+  }).orderBy('created', 'desc').list(0, 10);
+``
