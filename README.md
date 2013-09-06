@@ -210,7 +210,7 @@ var IntegerValidator, Model, Obeserve, User, promise, user;
     }
   });
 
-  user = User["new"]({
+  user = User.new({
     userId: 23,
     email: 'zolazhou@gmail.com',
     age: 30
@@ -226,7 +226,7 @@ var IntegerValidator, Model, Obeserve, User, promise, user;
 
   promise = user.update();
 
-  promise = user["delete"]();
+  promise = user.delete();
 
   promise = User.find({
     userId: 123
