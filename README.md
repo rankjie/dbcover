@@ -2,6 +2,7 @@
 
 Install:
 `npm install dbcover`
+(not done yet.)
 
 
 Usage:
@@ -71,6 +72,7 @@ user = User.new
   email: 'zolazhou@gmail.com'
   age: 30
 
+# Save instance [DONE]
 promise = user.save()
 
 # Updating attributes [DONE]
@@ -81,12 +83,16 @@ promise = user.update()
 # Deleting instance [DONE]
 promise = user.delete()
 
+
+
 # Query [NEED TEST]
+# All promises returned by Query or findBy, will be resolved with a set of instances
+# Or, rejected with errors.
 promise = User.find(userId: 123).first()
 promise = User.find(age: 30, created__gt: 2334343).first()
 promise = User.find(age: 30).all()
 
-# Find by primkeys [NEED TEST]
+# Find by primkeys [DONE]
 promise = User.findByPk(userID: 234, age: 99)
 promise = User.findByExamplePrimkey('someValue')
 
