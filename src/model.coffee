@@ -92,16 +92,15 @@ class Model
     capitaliseFirstLetter = (str) ->
       return str.charAt(0).toUpperCase() + str.slice(1)
 
+    self = @
     for key in @primkeys
       ( (key)->
           Model.prototype['findBy'+capitaliseFirstLetter(key.name)] = (v)->
-            if toType(values) isnt 'object'
-              values = {}
-              values[key.name] = v
+            if toType(v) isnt 'object' then values[key.name] = v else values = v
             sqlStr = []
             for name in key.keyName
-              sqlStr.push @$nameToField[name].column + ' = ' + @$nameToField[name].toDB values[name]
-            return @find(sqlStr.join(' AND ')).all()
+              sqlStr.push self.$nameToField[name].column + ' = ' + self.$nameToField[name].toDB values[name]
+            return self.find(sqlStr.join(' AND ')).all()
       )(key)
 
   # 生产instance

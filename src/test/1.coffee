@@ -57,26 +57,17 @@ User = new Model
 #   name:   '111号测试人员'
 #   age:    99
 
-User.findByUserId(83)
+# User.findByUserId(83)
+# .then (u) ->
+#   console.log '---------------------------'
+#   console.log u
+# , (err) ->
+#   console.log err
+
+
+User.findById(age:22)
 .then (u) ->
   console.log '---------------------------'
   console.log u
 , (err) ->
   console.log err
-
-# u.update()
-
-# promise1 = u.delete()
-
-# console.log u
-
-# Observe.listAll()
-# console.log u
-
-# u.save()
-# u.$cache.set 'abc', '123'
-
-
-# Observe.endAll()
-
-# console.log u

@@ -16,12 +16,12 @@
   "dependencies": {
     "pg":"*",
     "mysql":"*",
-    "q":"*",
-    "squel":"*",
     "memcached":"*",
+    "redis":"*",
+    "squel":"*",
     "node-simple-logger":"*",
     "lodash":"*",
-    "redis":"*",
+    "q":"*",
     "validator":"*"
   }
 }
