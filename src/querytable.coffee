@@ -118,6 +118,7 @@ class QueryTable
           else
             operator = operators[opkey]
             columnName = k.slice(0, k.length-4)
+          console.log columnName
           sql = sql.where(@nameToField[columnName].column + operator + @nameToField[columnName].toDB v)
 
       if @_orderBy? and @_orderBy.length > 0

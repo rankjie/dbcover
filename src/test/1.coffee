@@ -52,10 +52,17 @@ User = new Model
   sayHi: () ->
     console.log 'hi'
 
-# u = User.new 
-#   userId: 808
-#   name:   '111号测试人员'
-#   age:    99
+u = User.new 
+  userId: 999
+  name:   '00号测试人员'
+  age:    20
+
+u.save()
+.then (result)->
+  console.log result
+, (err) ->
+  console.log err
+
 
 # User.findByUserId(83)
 # .then (u) ->
@@ -65,9 +72,9 @@ User = new Model
 #   console.log err
 
 
-User.findById(age:22)
-.then (u) ->
-  console.log '---------------------------'
-  console.log u
-, (err) ->
-  console.log err
+# User.find(age__gt:99).all()
+# .then (u) ->
+#   console.log '---------------------------'
+#   console.log u
+# , (err) ->
+#   console.log err

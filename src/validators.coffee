@@ -11,7 +11,6 @@ Validators.integer = class IntegerValidator
   doValidate: (num)->
     try
       check(num).isInt().max(@max).min(@min)
-      @result.okay = true
     catch e
       @result.error = e
     return @result
@@ -25,9 +24,8 @@ Validators.string = class StringValidator
   doValidate: (str)->
     try
       check(num).len(@min, @max)
-      @result.okay = true
     catch e
-      @result.error = e
+      @result.error = e.message
     return @result
 
 Validators.email = class EmailValidator
@@ -37,7 +35,6 @@ Validators.email = class EmailValidator
   doValidate: (str)->
     try
       check(str).isEmail()
-      @result.okay = true
     catch e
       @result.error = e
     return @result
@@ -49,7 +46,6 @@ Validators.required = class NullValidator
   doValidate: (str)->
     try
       check(str).isNull()
-      @result.okay = true
     catch e
       @result.error = e
     return @result

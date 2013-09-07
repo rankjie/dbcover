@@ -85,7 +85,7 @@ promise = user.delete()
 
 
 
-# Query [NEED TEST]
+# Query [DONE]
 # All promises returned by Query or findBy, will be resolved with a set of instances
 # Or, rejected with errors.
 promise = User.find(userId: 123).first()

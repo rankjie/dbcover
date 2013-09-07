@@ -2,6 +2,7 @@
 _             = require 'lodash'
 {Validators}  = require './validators'
 QueryTable    = require './querytable'
+Q             = require 'q'
 
 class Instance
   constructor: (table, pks, nameToField , vals, db, cache, userDefineMethods, primkeys) ->
@@ -24,12 +25,18 @@ class Instance
   
   save: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
-    result = @validate()
-    if result.okay
-      return queryTable.save(@) 
+    deferred = Q.defer()
+    validationResult = @validate()
+    unless validationResult.error?
+      # 没有error就认为没有出错
+      queryTable.save(@)
+      .then (result)->
+        deferred.resolve result
+      , (err)->
+        deferred.reject err
     else
-      deferred = Q.defer()
-      deferred.reject result.error
+      deferred.reject validationResult.error
+    return deferred.promise
 
   update: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
@@ -46,19 +53,23 @@ class Instance
 
   # indices(pks)要检查是否为空
   validate: ->
+    deferred = Q.defer()
+    result = {}
     for index in @$pks
-      for name in index.fields
-        return false if not @[name]?
-
+      for name in index.fields when not @[name]?
+        result.error = "[ERROR] Field #{name}: is missing"
+        return result
     for name, field of @$nameToField
-      return false if (field.required or field.primkey) and not @[name]?
+      if (field.required or field.primkey) and not @[name]?
+        result.error = "[ERROR] Field #{name}: is missing"
+        return result
       # validator是string的话。例如'email'
       if field.validator?
         if toType(field.validator) is 'string'
-          return (new Validators[field.validator]).doValidate @[name]
+          re = new Validators[field.validator].doValidate @[name]
         else
-          return field.validator.doValidate @[name]
-
-    return true
+          re = field.validator.doValidate @[name]
+        result.error = "[ERROR] Field #{name}: #{re.error}" if re.error
+    return result
 
 module.exports = Instance
