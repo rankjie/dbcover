@@ -10,7 +10,12 @@ Usage (in coffeescript):
 ```coffeescript
 {Obeserve}          = require 'dbcover'
 {Model}             = require 'dbcover'
+# Require whatever validator you need. Full list of validators are in src/validators
 {IntegerValidator}  = require('dbcover').Validator
+# Or, require them all. Then, you can define a IntegerValidation with Validator.integer
+# {Validator} = require('dbcover').Validator
+# IntegerValidator = Validator.integer
+
 
 # Define database connection
 Observe.define 'repo',
