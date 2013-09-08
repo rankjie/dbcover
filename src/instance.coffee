@@ -57,11 +57,11 @@ class Instance
     result = {}
     for index in @$pks
       for name in index.fields when not @[name]?
-        result.error = "[ERROR] Field #{name}: is missing"
+        result.error = "Error Field #{name}: is missing"
         return result
     for name, field of @$nameToField
       if (field.required or field.primkey) and not @[name]?
-        result.error = "[ERROR] Field #{name}: is missing"
+        result.error = "Error Field #{name}: is missing"
         return result
       # validator是string的话。例如'email'
       if field.validator?
@@ -69,7 +69,7 @@ class Instance
           re = new Validators[field.validator].doValidate @[name]
         else
           re = field.validator.doValidate @[name]
-        result.error = "[ERROR] Field #{name}: #{re.error}" if re.error
+        result.error = "Error Field #{name}: #{re.error}" if re.error
     return result
 
 module.exports = Instance

@@ -61,7 +61,7 @@ u.save()
 .then (result)->
   console.log result
 , (err) ->
-  console.log err
+  console.log err.toString()
 
 
 # User.findByUserId(83)
