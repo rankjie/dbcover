@@ -138,6 +138,7 @@ class QueryTable
     else if @_queryType is 'insert'
       sql = sqlbuilder.insert().into(@table)
       for f in @_fieldsToInsert
+        console.log f
         sql = sql.set f.column, f.value
 
     # need fix!

@@ -55,11 +55,12 @@ class Instance
   validate: ->
     deferred = Q.defer()
     result = {}
-    for index in @$pks
-      for name in index.fields when not @[name]?
-        result.error = "Error: Field #{name}: is missing"
-        # Error: ER_DUP_ENTRY: Duplicate entry '999' for key 'PRIMARY'
-        return result
+    if @$pks?
+      for index in @$pks
+        for name in index.fields when not @[name]?
+          result.error = "Error: Field #{name}: is missing"
+          # Error: ER_DUP_ENTRY: Duplicate entry '999' for key 'PRIMARY'
+          return result
     for name, field of @$nameToField
       if (field.required or field.primkey) and not @[name]?
         result.error = "Error: Field #{name}: is missing"

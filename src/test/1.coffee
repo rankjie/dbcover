@@ -80,6 +80,24 @@ u = User.new
   name:   '00号测试人员'
   age:    20
 
+
+# date = new Date()
+# console.log  date.toISOString()
+
+w = Weather.new
+  city: '蘑菇囤儿'
+  lowTemp: '-19'
+  highTemp: '27'
+  rain: '200'
+  date: new Date
+
+
+w.save()
+.then (result)->
+  console.log result
+, (err) ->
+  console.log err.toString()
+
 # u.save()
 # .then (result)->
 #   console.log result
@@ -104,10 +122,10 @@ u = User.new
 #   console.log err
 
 
-User.find(age__gt:98).all()
-.then (u) ->
-  console.log '---------------------------'
-  console.log u
-, (err) ->
-  console.log err
+# User.find(age__gt:98).all()
+# .then (u) ->
+#   console.log '---------------------------'
+#   console.log u
+# , (err) ->
+#   console.log err
 
