@@ -46,8 +46,6 @@ class QueryTable
     @_limit = limit
     @query()
 
-
-
   save: (obj)->
     @_queryType         = 'insert'
     @_cacheData         = {}
@@ -150,15 +148,17 @@ class QueryTable
 
 
 
-    if @_condition?
-      for i in [0...sql.match(/\?/g).length] by 1
-        sql = sql.substr(0, sql.indexOf replace_char) + "#{@_condition[i]}" + sql.substr(sql.indexOf(replace_char) + replace_char.length)
-    else if @_args?
-      for k, v of @_args
-        sql = sql.replace prefix+k, "#{v}"
+    # if @_condition?
+    #   s = sql.toString()
+    #   for i in [0...s.match(/\?/g).length] by 1
+    #     console.log @_condition[i]
+    #     s = s.substr(0, s.indexOf replace_char) + "#{@_condition[i]}" + s.substr(s.indexOf(replace_char) + replace_char.length)
+    # else if @_args?
+    #   for k, v of @_args
+    #     s = s.replace prefix+k, "#{v}"
 
 
-    console.log '最后执行的sql：'+sql.toString()
+    # console.log '最后执行的sql：'+sql.toString()
     return sql.toString()
 
   # deferred.reject err if err 需要改一下。
@@ -197,7 +197,7 @@ class QueryTable
         if _.isEmpty(data) or data.$family?
           # console.log 'cache查到的是空的'
           # 从db查
-          self.db.query sql, (err, rows) ->
+          self.db.query sql, self._condition ? self._args, (err, rows) ->
             if err?
               # console.log 'db查的时候  出错了'
               deferred.reject err

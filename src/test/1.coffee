@@ -65,7 +65,7 @@ Weather = new Model
   meta:
     table: '天气'
     repo: 'pg'
-    cache: 'memcache'
+    cache: 'redis'
     fields: [
       {name: 'id', type: 'integer', column: 'id', primkey: true}
       {name: 'city', type: 'string', column: '城市'}
@@ -85,21 +85,28 @@ u = User.new
 # date = new Date()
 # console.log  date.toISOString()
 
-w = Weather.new
-  id:   11
-  city: '蘑菇囤儿4'
-  lowTemp: '-19'
-  highTemp: '27'
-  rain: '200'
-  date: new Date
+# w = Weather.new
+#   id:   11
+#   city: '蘑菇囤儿4'
+#   lowTemp: '-19'
+#   highTemp: '27'
+#   rain: '200'
+#   date: new Date
 
-w.city = '驻马店'
-
-w.update()
+Weather.find('城市 = :city and 降水量 > :rain')
+.set(city: '驻马店', rain: 199).all()
 .then (result)->
-  console.log 're:'+result
+  console.log result
 , (err)->
   console.log err
+
+# w.city = '驻马店'
+
+# w.update()
+# .then (result)->
+#   console.log 're:'+result
+# , (err)->
+#   console.log err
 
 # Weather.find(city: '蘑菇囤儿2').all()
 # .then (result)->

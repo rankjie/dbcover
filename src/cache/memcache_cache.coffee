@@ -23,8 +23,6 @@ class memcacheMethods
       callback err, null  if callback
 
   get: (keys, callback) ->
-    console.log keys
-    console.log toType(keys)
     if toType(keys) is 'string' 
       k = []
       k.push keys
