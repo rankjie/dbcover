@@ -46,6 +46,8 @@ class QueryTable
     @_limit = limit
     @query()
 
+
+
   save: (obj)->
     @_queryType         = 'insert'
     @_cacheData         = {}
@@ -61,8 +63,8 @@ class QueryTable
         value : field.toDB(obj[name])
 
     @_cachekey = @cacheKey(obj)
-    console.log 'cacheData: '+ JSON.stringify @_cacheData
-    console.log 'cacheKey: ' + @_cachekey
+    # console.log 'cacheData: '+ JSON.stringify @_cacheData
+    # console.log 'cacheKey: ' + @_cachekey
     @query()
 
   update: (obj) ->
@@ -71,7 +73,6 @@ class QueryTable
     @pkStr = []
     for k in obj.$primkeys
       for name in k.keyName
-        console.log name
         @pkStr.push obj.$nameToField[name].column + ' = ' + obj.$nameToField[name].val
     # 找出需要做update的数据
     for name, field of obj.$nameToField when obj[name] isnt field.val
@@ -138,7 +139,6 @@ class QueryTable
     else if @_queryType is 'insert'
       sql = sqlbuilder.insert().into(@table)
       for f in @_fieldsToInsert
-        console.log f
         sql = sql.set f.column, f.value
 
     # need fix!
@@ -158,7 +158,7 @@ class QueryTable
         sql = sql.replace prefix+k, "#{v}"
 
 
-    console.log '最后的查询sql：'+sql.toString()
+    console.log '最后执行的sql：'+sql.toString()
     return sql.toString()
 
   # deferred.reject err if err 需要改一下。
@@ -195,17 +195,22 @@ class QueryTable
         # memcached这里有个bug(?)，如果查不到对应的key，会返回一个很奇怪的对象（包含一个叫$family等的东西，所以这样粗糙hack一下）
         # need further fix
         if _.isEmpty(data) or data.$family?
-          console.log 'cache查到的是空的'
+          # console.log 'cache查到的是空的'
           # 从db查
           self.db.query sql, (err, rows) ->
             if err?
-              console.log 'db查的时候  出错了'
+              # console.log 'db查的时候  出错了'
               deferred.reject err
             else
+              # 先把sql作为key，存入cache
               self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
-                console.log  '写入cache'
+                # console.log  '写入cache'
                 # 把data变成object再返回
                 deferred.resolve dbToInstance rows
+              # 把每个查到的对象都存入cache
+              for obj in dbToInstance rows
+                self.cache.set self.cacheKey(obj), self.cacheDate(obj), defaultTTL
+
         # cache有的话
         else
           deferred.resolve cacheToInstance data[cacheKey]
@@ -249,6 +254,13 @@ class QueryTable
     for k in obj.$primkeys
       for keyname in k.keyName
         key += obj[keyname] + ':'
-    return key.slice 0, -1
+    return key.slice(0, -1).replace(/\s+/g, '')
+
+  cacheDate: (obj)->
+    _cacheData = {}
+    for name, field of obj.$nameToField
+      # 把数据存到cacheData，用于存入cache
+      _cacheData[name] = field.toDB obj[name]
+    return _cacheData
 
 module.exports = QueryTable

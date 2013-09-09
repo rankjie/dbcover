@@ -17,16 +17,13 @@ class Postgres
       for k, v of args
         sql = sql.replace prefix+k, "'#{v}'"
     sql = replaceAll '`', '"', sql
-    console.log sql
     callback = args if callback is undefined or callback is null
     @pool.connect (err, client, done)->
       if err
-        return console.error('error fetching client from pool', err)
+        return console.error('Error when getting PostgreSQL connection', err)
       client.query sql, (err, rows)->
         done()
-        console.log rows
-        console.log err
-        return callback err, rows.rows
+        return callback err, rows['rows'] ? rows
 
   end: ->
     pg.end()

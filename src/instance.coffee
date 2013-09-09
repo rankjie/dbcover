@@ -40,16 +40,28 @@ class Instance
 
   update: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
-    result = @validate()
-    if result.okay
-      return queryTable.update(@) 
+    validationResult = @validate()
+    deferred = Q.defer()
+    unless validationResult.error?
+      queryTable.update(@) 
+      .then (result)->
+        deferred.resolve result
+      , (err)->
+        deferred.reject err
     else
-      deferred = Q.defer()
       deferred.reject result.error
+    return deferred.promise
+
 
   delete: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
-    return queryTable.delete @
+    deferred = Q.defer()
+    queryTable.delete(@)
+    .then (result)->
+      deferred.resolve result
+    , (err)->
+      deferred.reject err
+    return deferred.promise
 
   # indices(pks)要检查是否为空
   validate: ->

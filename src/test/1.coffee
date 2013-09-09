@@ -67,6 +67,7 @@ Weather = new Model
     repo: 'pg'
     cache: 'memcache'
     fields: [
+      {name: 'id', type: 'integer', column: 'id', primkey: true}
       {name: 'city', type: 'string', column: '城市'}
       {name: 'lowTemp', type: 'number', column: '最低气温'}
       {name: 'highTemp', type: 'number', column: '最高气温'}
@@ -85,18 +86,37 @@ u = User.new
 # console.log  date.toISOString()
 
 w = Weather.new
-  city: '蘑菇囤儿'
+  id:   11
+  city: '蘑菇囤儿4'
   lowTemp: '-19'
   highTemp: '27'
   rain: '200'
   date: new Date
 
+w.city = '驻马店'
 
-w.save()
+w.update()
 .then (result)->
-  console.log result
-, (err) ->
-  console.log err.toString()
+  console.log 're:'+result
+, (err)->
+  console.log err
+
+# Weather.find(city: '蘑菇囤儿2').all()
+# .then (result)->
+#   result.delete()
+#   .then (result)->
+#     console.log result
+#   , (err) ->
+#     console.log err
+# , (err)->
+#   console.log err
+
+
+# w.save()
+# .then (result)->
+#   console.log result
+# , (err) ->
+#   console.log err.toString()
 
 # u.save()
 # .then (result)->

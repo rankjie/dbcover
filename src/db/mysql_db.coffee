@@ -9,7 +9,7 @@ class MySQL
   query: (sql, args, callback) ->
     @pool.getConnection (err, connection)->
       if err
-        console.log 'Error when get con:'+err
+        console.log 'Error when getting MySQL connection:'+err
       if Object.prototype.toString.call(args) == '[object Array]'
         console.log sql
         connection.query sql, args, (err, rows) ->
@@ -18,7 +18,7 @@ class MySQL
       else if Object.prototype.toString.call(args) == '[object Object]'
         for k, v of args
           sql = sql.replace prefix+k, "'#{v}'"
-        console.log sql
+        # console.log sql
         connection.query sql, (err, rows)->
           connection.release()
           callback err, rows
