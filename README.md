@@ -2,12 +2,11 @@
 
 Install:
 `npm install dbcover`
-(not yet available.)
-
 
 Usage (in coffeescript):
 
 ```coffeescript
+
 {Obeserve}          = require 'dbcover'
 {Model}             = require 'dbcover'
 # Require whatever validator you need. Full list of validators are in src/validators
@@ -121,6 +120,7 @@ promise = User.find('age > :age and created > :created')
 Usage (in javascript):
 
 ```javascript
+
 Obeserve = require('dbcover').Obeserve;
 
 Model = require('dbcover').Model;
@@ -263,4 +263,5 @@ promise = User.find('age > :age and created > :created').set({
   age: 30,
   created: 1234324234
 }).orderBy('created', 'desc').list(0, 10);
+
 ``

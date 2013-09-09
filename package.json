@@ -8,6 +8,8 @@
   },
   "repository": "",
   "keywords": [
+    "mysql",
+    "PostgreSQL",
     "orm",
     "cache"
   ],
