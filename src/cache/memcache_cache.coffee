@@ -1,19 +1,38 @@
 memcache = require 'memcached'
+_        = require 'lodash'
+{toType} = require '../utils'
 
 class memcacheMethods
-  constructor: (config) ->
+  constructor: (_config) ->
+    config = _.cloneDeep _config
     serverString = "#{config.host}:#{config.port}"
     delete config.host
     delete config.port
     @mem = new memcache serverString, config.options
+    # if Object.keys(config).length isnt 0
+    #   # console.log config
+    #   @mem = new memcache serverString, config.options
+    # else
+    #   console.log '空了'
+    #   @mem = new memcache serverString
 
   set: (key, row, ttl, callback) ->
+    unless callback?
+      ttl = 0
     @mem.set key, row, ttl, (err) ->
       callback err, null  if callback
 
   get: (keys, callback) ->
-    @mem.getMulti keys, (err, data) ->
-      callback err, data
+    console.log keys
+    console.log toType(keys)
+    if toType(keys) is 'string' 
+      k = []
+      k.push keys
+      @mem.getMulti k, (err, data) ->
+        callback err, data
+    else
+      @mem.getMulti keys, (err, data) ->
+        callback err, data
 
   del: (key, callback) ->
     @mem.del key, (err) ->

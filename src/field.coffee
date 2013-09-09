@@ -23,6 +23,16 @@ fieldTypes['integer'] = class IntegerField extends Field
   defaultValue: ->
     return 0
 
+fieldTypes['number'] = class NumberField extends Field
+  toDB: (val) ->
+    return val
+
+  fromDB: (val) ->
+    return val
+
+  defaultValue: ->
+    return 0
+
 fieldTypes['string'] = class StringField extends Field
   toDB: (val) ->
     return val

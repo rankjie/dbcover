@@ -24,6 +24,7 @@ class Postgres
         return console.error('error fetching client from pool', err)
       client.query sql, (err, rows)->
         done()
+        # console.log rows
         return callback err, rows.rows
 
   end: ->

@@ -118,8 +118,7 @@ class QueryTable
           else
             operator = operators[opkey]
             columnName = k.slice(0, k.length-4)
-          console.log columnName
-          sql = sql.where(@nameToField[columnName].column + operator + @nameToField[columnName].toDB v)
+          sql = sql.where(@nameToField[columnName].column + operator + "'" + @nameToField[columnName].toDB(v) + "'")
 
       if @_orderBy? and @_orderBy.length > 0
         for f,i in @_orderBy
@@ -186,26 +185,29 @@ class QueryTable
 
     # select类型，返回
     if self._queryType is 'find'
+      cacheKey = sql.replace(/\s+/g, '')
       # 先从cache找
-      self.cache.get sql, (err, data) ->
+      self.cache.get cacheKey, (err, data)->
         # 出错
         deferred.reject err if err
-        console.log 'cache查到了：'
-        if _.isEmpty data then console.log '空的' else console.log data
         # cache没有
-        if _.isEmpty(data)
-          console.log '去DB查！'
+        # memcached这里有个bug(?)，如果查不到对应的key，会返回一个很奇怪的对象（包含一个叫$family等的东西，所以这样粗糙hack一下）
+        # need further fix
+        if _.isEmpty(data) or data.$family?
+          console.log 'cache查到的是空的'
           # 从db查
           self.db.query sql, (err, rows) ->
-            if err
+            if err?
+              console.log 'db查的时候  出错了'
               deferred.reject err
-              return deferred.promise
-            self.cache.set sql, JSON.stringify(rows), (err, response) ->
-              # 把data变成object再返回
-              deferred.resolve dbToInstance rows
+            else
+              self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
+                console.log  '写入cache'
+                # 把data变成object再返回
+                deferred.resolve dbToInstance rows
         # cache有的话
         else
-          deferred.resolve cacheToInstance data[sql]
+          deferred.resolve cacheToInstance data[cacheKey]
 
     # insert类型
     if self._queryType is 'insert'

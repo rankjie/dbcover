@@ -78,15 +78,16 @@ class Model
         name   : f.name
         keyName: keyName
 
-    for f in dataDefine.meta.indices
-      if toType(f.fields) is 'array'
-        keyName = f.fields
-      else
-        keyName = []
-        keyName.push index.fields
-      @primkeys.push
-        name   : f.name
-        keyName: keyName
+    if dataDefine.meta.indices?
+      for f in dataDefine.meta.indices
+        if toType(f.fields) is 'array'
+          keyName = f.fields
+        else
+          keyName = []
+          keyName.push index.fields
+        @primkeys.push
+          name   : f.name
+          keyName: keyName
     
     # 实现findByIndex
     capitaliseFirstLetter = (str) ->
