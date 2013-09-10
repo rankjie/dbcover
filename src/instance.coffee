@@ -74,7 +74,7 @@ class Instance
           # Error: ER_DUP_ENTRY: Duplicate entry '999' for key 'PRIMARY'
           return result
     for name, field of @$nameToField
-      if (field.required or field.primkey) and not @[name]?
+      if (field.required or field.primkey) and not @[name]? and not field.prikey
         result.error = "Error: Field #{name}: is missing"
         return result
       # validator是string的话。例如'email'

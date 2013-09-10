@@ -119,7 +119,7 @@ promise = User.find('age > :age and created > :created')
 
 Usage (in javascript):
 
-```javascript
+```javascript 
 
 Obeserve = require('dbcover').Obeserve;
 
