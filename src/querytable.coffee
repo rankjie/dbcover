@@ -223,15 +223,17 @@ class QueryTable
               # console.log 'db查的时候  出错了'
               deferred.reject err
             else
-              # 先把sql作为key，存入cache
-              self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
-                # console.log  '写入cache'
-                # 把data变成object再返回
+              if rows.length > 0
+                # 先把sql作为key，存入cache
+                self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
+                  # console.log  '写入cache'
+                  # 把data变成object再返回
+                  deferred.resolve dbToInstance rows
+                # 把每个查到的对象都存入cache
+                for obj in dbToInstance rows
+                  self.cache.set self.cacheKey(obj), self.cacheDate(obj), defaultTTL
+              else
                 deferred.resolve dbToInstance rows
-              # 把每个查到的对象都存入cache
-              for obj in dbToInstance rows
-                self.cache.set self.cacheKey(obj), self.cacheDate(obj), defaultTTL
-
         # cache有的话
         else
           deferred.resolve cacheToInstance data[cacheKey]

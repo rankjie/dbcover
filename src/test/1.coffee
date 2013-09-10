@@ -47,11 +47,11 @@ User = new Model
   meta:
     table: 'work'
     repo: 'mysql'   # default repo name is 'default'
-    cache: 'memcache' # set to false to disable caching
+    cache: 'redis' # set to false to disable caching
     fields: [
       {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
       {name: 'name',    type: 'string',   validator: null}
-      {name: 'email',   type: 'string',   validator: new Validators.email}
+      # {name: 'email',   type: 'string',   validator: new Validators.email}
       {name: 'age',     type: 'integer',  validator: new Validators.integer(1, 100)}
     ]
     indices: [
@@ -77,11 +77,18 @@ Weather = new Model
     ]
 
 
-u = User.new 
-  userId: 999
-  name:   '00号测试人员'
-  email:  '1@a.cn'
-  age:    20
+# u = User.new 
+#   userId: 999
+#   name:   '00号测试人员'
+#   email:  '1@a.cn'
+#   age:    20
+
+
+User.find(name:'123号测试人员').all()
+.then (u)->
+  console.log u
+, (err)->
+  console.log err
 
 
 # date = new Date()
