@@ -5,7 +5,7 @@ db                 = require './db/db'
 cache              = require './cache/cache'
 Instance           = require './instance'
 QueryTable         = require './querytable'
-{Validator, StringValidator, IntegerValidator, EmailValidator}  = require './validators'
+{Validators, StringValidator, IntegerValidator, EmailValidator}  = require './validators'
 
 repoGroup  = {}
 cacheGroup = {}
@@ -123,4 +123,4 @@ class Model
 
 exports.Model   = Model
 exports.Observe = new Observe
-exports.Validators = Validator
+exports.Validators = Validators

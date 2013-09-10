@@ -1,6 +1,6 @@
 {Model}      = require '../model'
 {Observe}    = require '../model'
-{Validators} = require '../validators'
+{Validators} = require '../model'
 
 Observe.define 'repo',
   name: 'mysql'
@@ -51,6 +51,7 @@ User = new Model
     fields: [
       {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
       {name: 'name',    type: 'string',   validator: null}
+      {name: 'email',   type: 'string',   validator: new Validators.email}
       {name: 'age',     type: 'integer',  validator: new Validators.integer(1, 100)}
     ]
     indices: [
@@ -79,6 +80,7 @@ Weather = new Model
 u = User.new 
   userId: 999
   name:   '00号测试人员'
+  email:  '1@a.cn'
   age:    20
 
 
@@ -93,12 +95,12 @@ u = User.new
 #   rain: '200'
 #   date: new Date
 
-Weather.find('城市 = :city and 降水量 > :rain')
-.set(city: '驻马店', rain: 199).all()
-.then (result)->
-  console.log result
-, (err)->
-  console.log err
+# Weather.find('城市 = :city and 降水量 > :rain')
+# .set(city: '驻马店', rain: 199).all()
+# .then (result)->
+#   console.log result
+# , (err)->
+#   console.log err
 
 # w.city = '驻马店'
 

@@ -16,6 +16,7 @@
   "author": "Leijie Hou",
   "license": "BSD",
   "dependencies": {
+    "dbcover": "http://gitlab.widget-inc.com/leijie/observe.git",
     "pg":"*",
     "mysql":"*",
     "memcached":"*",
