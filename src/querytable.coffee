@@ -50,6 +50,7 @@ class QueryTable
     @_queryType         = 'insert'
     @_cacheData         = {}
     @_fieldsToInsert    = []
+    deferred = Q.defer()
     for name, field of obj.$nameToField
       # 把数据存到cacheData，用于存入cache
       @_cacheData[name] = field.toDB obj[name]
@@ -63,7 +64,14 @@ class QueryTable
     @_cachekey = @cacheKey(obj)
     # console.log 'cacheData: '+ JSON.stringify @_cacheData
     # console.log 'cacheKey: ' + @_cachekey
+
     @query()
+    .then (re) ->
+      deferred.resolve re
+    , (err)->
+      deferred.reject err
+
+    return deferred.promise
 
   update: (obj) ->
     @_queryType = 'update'
@@ -83,6 +91,12 @@ class QueryTable
     @_cachekey = @cacheKey(obj)
 
     @query()
+    .then (re) ->
+      deferred.resolve re
+    , (err)->
+      deferred.reject err
+
+    return deferred.promise
 
   delete: (obj)->
     @_queryType = 'delete'
@@ -92,7 +106,14 @@ class QueryTable
         # 因为instance可能在delete之前有修改过变量值，但是没有update。这时候数据库的数据是老的，所以要用
         # nameToField里面存的变量（用于在update的时候找出需要做set的column）
         @pkStr.push obj.$nameToField[name].column + ' = ' + obj.$nameToField[name].val
+     
     @query()
+    .then (re) ->
+      deferred.resolve re
+    , (err)->
+      deferred.reject err
+
+    return deferred.promise
 
   toSQL: ->
     if @_queryType is 'find'
@@ -225,9 +246,9 @@ class QueryTable
           return deferred.promise
         if self.cache
           # 存入db
-          self.cache.set self._cachekey, JSON.stringify self._cacheData, defaultTTL, (err, response) ->
-            deferred.reject err if err
-            deferred.resolve null
+          self.cache.set self._cachekey, JSON.stringify(self._cacheData), defaultTTL, (err, response) ->
+            deferred.reject rows if err?
+            deferred.resolve rows
         else
           deferred.resolve rows
 
