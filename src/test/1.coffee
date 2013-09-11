@@ -49,14 +49,14 @@ User = new Model
     repo: 'mysql'   # default repo name is 'default'
     cache: 'redis' # set to false to disable caching
     fields: [
-      {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
+      # {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
       {name: 'name',    type: 'string',   validator: null}
       # {name: 'email',   type: 'string',   validator: new Validators.email}
       {name: 'age',     type: 'integer',  validator: new Validators.integer(1, 100)}
     ]
-    indices: [
-      {name: 'id',    fields: ['userId', 'age'], unique: true}
-    ]
+    # indices: [
+    #   {name: 'id',    fields: ['userId', 'age'], unique: true}
+    # ]
 
   sayHi: () ->
     console.log 'hi'
@@ -77,19 +77,49 @@ Weather = new Model
     ]
 
 
-# u = User.new 
-#   userId: 999
-#   name:   '00号测试人员'
-#   email:  '1@a.cn'
-#   age:    20
+
+UpUser = new Model
+  meta:
+    table: 'upcloud_user'
+    repo: 'mysql'
+    cache: 'redis'
+    fields: [
+      {name: 'id', type: 'integer', primkey: true, wait: true}
+      {name: 'email', type: 'string', validator: new Validators.email }
+      {name: 'password', type: 'string', required: 'true'}
+      {name: 'created_at', type: 'timestamp'}
+      {name: 'updated_at', type: 'timestamp'}
+    ]
 
 
-User.find(name:'123号测试人员').all()
-.then (u)->
+time = new Date
+
+u = UpUser.new
+  email     : 'rankjie@gmail.com'
+  password  : '405d3b8e375466aadad099d7ab5ab1cc'
+  created_at: time
+  updated_at: time
+
+u.save()
+.then (re)->
+  console.log re
   console.log u
 , (err)->
   console.log err
 
+
+
+# u = User.new 
+#   # userId: 990
+#   name:   '02号测试人员'
+#   email:  '1@a.cn'
+#   age:    20
+
+# u.save()
+# .then (re)->
+#   console.log  re
+# , (err)->
+#   console.log err
 
 # date = new Date()
 # console.log  date.toISOString()

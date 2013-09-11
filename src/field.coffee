@@ -12,6 +12,12 @@ class Field
   say: ->
     console.log '喵'
 
+  toDB: (val) ->
+    return val
+
+  fromDB: (val) ->
+    return val
+
 fieldTypes = {}
 
 fieldTypes['integer'] = class IntegerField extends Field
