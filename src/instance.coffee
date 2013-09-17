@@ -86,4 +86,10 @@ class Instance
         result.error = "Error: Field #{name}: #{re.error}" if re.error
     return result
 
+  getVals: ->
+    vals = {}
+    for name, field of @$nameToField
+      vals[name] = @[name]
+    return vals
+
 module.exports = Instance

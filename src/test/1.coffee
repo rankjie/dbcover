@@ -1,6 +1,7 @@
 {Model}      = require '../model'
 {Observe}    = require '../model'
 {Validators} = require '../model'
+Q            = require 'q'
 
 Observe.define 'repo',
   name: 'mysql'
@@ -49,14 +50,14 @@ User = new Model
     repo: 'mysql'   # default repo name is 'default'
     cache: 'redis' # set to false to disable caching
     fields: [
-      # {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
+      {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
       {name: 'name',    type: 'string',   validator: null}
       # {name: 'email',   type: 'string',   validator: new Validators.email}
       {name: 'age',     type: 'integer',  validator: new Validators.integer(1, 100)}
     ]
-    # indices: [
-    #   {name: 'id',    fields: ['userId', 'age'], unique: true}
-    # ]
+    indices: [
+      {name: 'id',    fields: ['userId', 'age'], unique: true}
+    ]
 
   sayHi: () ->
     console.log 'hi'
@@ -76,36 +77,49 @@ Weather = new Model
       {name: 'date', type: 'timestamp', column: '日期'}
     ]
 
+# p = Q.all [
+#   User.find(age__gt: 99).all()
+#   User.find(age__lt: 20).all()
+#   User.find(age__gt: 20).all()
+# ]
 
 
-UpUser = new Model
-  meta:
-    table: 'upcloud_user'
-    repo: 'mysql'
-    cache: 'redis'
-    fields: [
-      {name: 'id', type: 'integer', primkey: true, wait: true}
-      {name: 'email', type: 'string', validator: new Validators.email }
-      {name: 'password', type: 'string', required: 'true'}
-      {name: 'created_at', type: 'timestamp'}
-      {name: 'updated_at', type: 'timestamp'}
-    ]
+User.find(
+  userId__gt: 990
+).all()
+.then (result)->
+  console.log result
+.fail (err)->
+  console.log 'yep'+err
+
+# UpUser = new Model
+#   meta:
+#     table: 'upcloud_user'
+#     repo: 'mysql'
+#     cache: 'redis'
+#     fields: [
+#       {name: 'id', type: 'integer', primkey: true, wait: true}
+#       {name: 'email', type: 'string', validator: new Validators.email }
+#       {name: 'password', type: 'string', required: 'true'}
+#       {name: 'created_at', type: 'timestamp'}
+#       {name: 'updated_at', type: 'timestamp'}
+#     ]
 
 
-time = new Date
+# time = new Date
 
-u = UpUser.new
-  email     : 'rankjie@gmail.com'
-  password  : '405d3b8e375466aadad099d7ab5ab1cc'
-  created_at: time
-  updated_at: time
+# u = UpUser.new
+#   email     : 'rankjie@gmail.com'
+#   password  : '405d3b8e375466aadad099d7ab5ab1cc'
+#   created_at: time
+#   updated_at: time
 
-u.save()
-.then (re)->
-  console.log re
-  console.log u
-, (err)->
-  console.log err
+# u.save()
+# .then (re)->
+#   console.log re
+#   console.log u
+# , (err)->
+#   console.log err
 
 
 

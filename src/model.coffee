@@ -121,6 +121,7 @@ class Model
 
 
 
+
 exports.Model   = Model
 exports.Observe = new Observe
 exports.Validators = Validators

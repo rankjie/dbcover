@@ -82,6 +82,7 @@ class QueryTable
   update: (obj) ->
     @_queryType = 'update'
     @_fieldsToUpdate = []
+    deferred = Q.defer()
     @pkStr = []
     for k in obj.$primkeys
       for name in k.keyName
@@ -107,6 +108,7 @@ class QueryTable
   delete: (obj)->
     @_queryType = 'delete'
     @pkStr = []
+    deferred = Q.defer()
     for k in obj.$primkeys
       for name in k.keyName
         # 因为instance可能在delete之前有修改过变量值，但是没有update。这时候数据库的数据是老的，所以要用
@@ -164,7 +166,8 @@ class QueryTable
     else if @_queryType is 'insert'
       sql = sqlbuilder.insert().into(@table)
       for f in @_fieldsToInsert
-        sql = sql.set f.column, f.value
+        # console.log f
+        sql = sql.set f.column, f.value ? null
 
     # need fix!
     else if @_queryType is 'delete'
@@ -237,7 +240,7 @@ class QueryTable
                   deferred.resolve dbToInstance rows
                 # 把每个查到的对象都存入cache
                 for obj in dbToInstance rows
-                  self.cache.set self.cacheKey(obj), self.cacheDate(obj), defaultTTL
+                  self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), defaultTTL
               else
                 deferred.resolve dbToInstance rows
         # cache有的话
