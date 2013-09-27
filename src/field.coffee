@@ -60,7 +60,7 @@ fieldTypes['timestamp'] = class TimestampField extends Field
     if not val?
       return val;
     try
-      return new Date val
+      return (new Date(val))
     catch e
       return null
 

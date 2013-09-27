@@ -217,35 +217,57 @@ class QueryTable
     # select类型，返回
     if self._queryType is 'find'
       cacheKey = sql.replace(/\s+/g, '')
-      # 先从cache找
-      self.cache.get cacheKey, (err, data)->
-        # 出错
-        deferred.reject err if err
-        # cache没有
-        # memcached这里有个bug(?)，如果查不到对应的key，会返回一个很奇怪的对象（包含一个叫$family等的东西，所以这样粗糙hack一下）
-        # need further fix
-        if _.isEmpty(data) or data.$family?
-          # console.log 'cache查到的是空的'
-          # 从db查
-          self.db.query sql, self._condition ? self._args, (err, rows) ->
-            if err?
-              # console.log 'db查的时候  出错了'
-              deferred.reject err
-            else
-              if rows.length > 0
-                # 先把sql作为key，存入cache
-                self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
-                  # console.log  '写入cache'
-                  # 把data变成object再返回
-                  deferred.resolve dbToInstance rows
-                # 把每个查到的对象都存入cache
-                for obj in dbToInstance rows
-                  self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), defaultTTL
+      # 看是否有cache定义
+      if self.cache?
+        # 先从cache找
+        self.cache.get cacheKey, (err, data)->
+          # 出错
+          deferred.reject err if err
+          # cache没有
+          # memcached这里有个bug(?)，如果查不到对应的key，会返回一个很奇怪的对象（包含一个叫$family等的东西，所以这样粗糙hack一下）
+          # need further fix
+          if _.isEmpty(data) or data.$family?
+            # console.log 'cache查到的是空的'
+            # 从db查
+            self.db.query sql, self._condition ? self._args, (err, rows) ->
+              if err?
+                # console.log 'db查的时候  出错了'
+                deferred.reject err
               else
+                if rows.length > 0
+                  # 先把sql作为key，存入cache
+                  self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
+                    # console.log  '写入cache'
+                    # 把data变成object再返回
+                    deferred.resolve dbToInstance rows
+                  # 把每个查到的对象都存入cache
+                  for obj in dbToInstance rows
+                    self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), defaultTTL
+                else
+                  deferred.resolve dbToInstance rows
+          # cache有的话
+          else
+            deferred.resolve cacheToInstance data[cacheKey]
+      # 没设置cache的话
+      else
+        # 直接从db找
+        self.db.query sql, self._condition ? self._args, (err, rows) ->
+          if err?
+            # console.log 'db查的时候  出错了'
+            deferred.reject err
+          else
+            if rows.length > 0
+              # 先把sql作为key，存入cache
+              self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
+                # console.log  '写入cache'
+                # 把data变成object再返回
                 deferred.resolve dbToInstance rows
-        # cache有的话
-        else
-          deferred.resolve cacheToInstance data[cacheKey]
+              # 把每个查到的对象都存入cache
+              for obj in dbToInstance rows
+                self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), defaultTTL
+            else
+              deferred.resolve dbToInstance rows
+              
 
     # insert类型
     if self._queryType is 'insert'

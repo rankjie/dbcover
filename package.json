@@ -1,6 +1,6 @@
 {
   "name": "dbcover",
-  "version": "0.0.5",
+  "version": "0.0.9",
   "description": "Object Relational Mapping With Cache(Memcached/Redis) Enabled For Mysql/PostgreSQL/more.",
   "main": "lib/model.js",
   "scripts": {
@@ -16,7 +16,6 @@
   "author": "Leijie Hou",
   "license": "BSD",
   "dependencies": {
-    "dbcover": "http://gitlab.widget-inc.com/leijie/observe.git",
     "pg":"*",
     "mysql":"*",
     "memcached":"*",
