@@ -218,7 +218,9 @@ class QueryTable
     if self._queryType is 'find'
       cacheKey = sql.replace(/\s+/g, '')
       # 看是否有cache定义
-      if self.cache?
+      if self.cache
+        # console.log '有定义cache哦！'
+        # console.log self
         # 先从cache找
         self.cache.get cacheKey, (err, data)->
           # 出错
@@ -257,17 +259,10 @@ class QueryTable
             deferred.reject err
           else
             if rows.length > 0
-              # 先把sql作为key，存入cache
-              self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
-                # console.log  '写入cache'
-                # 把data变成object再返回
-                deferred.resolve dbToInstance rows
-              # 把每个查到的对象都存入cache
-              for obj in dbToInstance rows
-                self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), defaultTTL
+              deferred.resolve dbToInstance rows
             else
               deferred.resolve dbToInstance rows
-              
+
 
     # insert类型
     if self._queryType is 'insert'
@@ -277,12 +272,17 @@ class QueryTable
         if err
           deferred.reject err
           return deferred.promise
+
+        # 取出wait的ID
+        for name in self._wait
+          self._objToSave[name] = rows.insertId
+          self._cacheData[name] = self._objToSave.$nameToField[name].toDB self._objToSave[name]
         if self.cache
-          # 取出wait的ID
-          for name in self._wait
-            self._objToSave[name] = rows.insertId
-            self._cacheData[name] = self._objToSave.$nameToField[name].toDB self._objToSave[name]
-          # 存入db
+          # # 取出wait的ID
+          # for name in self._wait
+          #   self._objToSave[name] = rows.insertId
+          #   self._cacheData[name] = self._objToSave.$nameToField[name].toDB self._objToSave[name]
+          # 存入cache
           self.cache.set self.cacheKey(self._objToSave), JSON.stringify(self._cacheData), defaultTTL, (err, response) ->
             deferred.reject rows if err?
             deferred.resolve rows
@@ -293,16 +293,22 @@ class QueryTable
     if self._queryType is 'delete'
       self.db.query sql, (err, rows) ->
         deferred.reject err if err
-        self.cache.del self._cachekey, (err, numberOfRowsDeleted) ->
-          deferred.reject err if err
+        if self.cache
+          self.cache.del self._cachekey, (err, numberOfRowsDeleted) ->
+            deferred.reject err if err
+            deferred.resolve numberOfRowsDeleted
+        else
           deferred.resolve numberOfRowsDeleted
 
     if self._queryType is 'update'
       self.db.query sql, (err, rows) ->
         deferred.reject err if err
-        # 从cache里删掉，以后要用的时候再取就是了
-        self.cache.del self._cachekey, (err, response) ->
-          deferred.reject err if err
+        if self.cache
+          # 从cache里删掉，以后要用的时候再取就是了
+          self.cache.del self._cachekey, (err, response) ->
+            deferred.reject err if err
+            deferred.resolve null
+        else
           deferred.resolve null
 
     return deferred.promise

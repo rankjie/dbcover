@@ -3,209 +3,108 @@
 {Validators} = require '../model'
 Q            = require 'q'
 
+{redis}      = require '/Volumes/Files/Documents/work/upcloud/src/routes/config'
+{mysql}      = require '/Volumes/Files/Documents/work/upcloud/src/routes/config'
+
 Observe.define 'repo',
-  name: 'mysql'
+  name: 'default'
   provider:
     type: 'mysql'
-    options:
-      host: 'localhost'
-      port: 3306
-      user: 'root'
-      password: '123123'
-      database: 'test'
-      connectionLimit: 4
-
-Observe.define 'repo',
-  name: 'pg'
-  provider:
-    type: 'postgresql'
-    options:
-      host: 'localhost'
-      port: 5432
-      user: 'jeremy'
-      password: '123123'
-      database: 'jeremy'
-
+    options: mysql
 
 Observe.define 'cache',
   name: 'default'
   provider:
     type: 'redis'
-    options:
-      host: 'localhost'
-      port: 6379
+    options: redis
 
-Observe.define 'cache',
-  name: 'memcache'
-  provider:
-    type: 'memcache'
-    options:
-      host: 'localhost'
-      port: 11212
-
-
-User = new Model 
+exports.User = User = new Model
   meta:
-    table: 'work'
-    repo: 'mysql'   # default repo name is 'default'
-    cache: 'redis' # set to false to disable caching
+    table: 'upcloud_user'
+    repo: 'default'
+    # cache: 'redis'
     fields: [
-      {name: 'userId',  type: 'string',   column:    'id', required: true, primkey: true}
-      {name: 'name',    type: 'string',   validator: null}
-      # {name: 'email',   type: 'string',   validator: new Validators.email}
-      {name: 'age',     type: 'integer',  validator: new Validators.integer(1, 100)}
-    ]
-    indices: [
-      {name: 'id',    fields: ['userId', 'age'], unique: true}
+      {name: 'id', type: 'integer', primkey: true, wait: true}
+      {name: 'email', type: 'string'}
+      {name: 'password', type: 'string'}
+      {name: 'created_at', type: 'timestamp'}
+      {name: 'updated_at', type: 'timestamp'}
     ]
 
-  sayHi: () ->
-    console.log 'hi'
-
-
-Weather = new Model
+exports.Group = Group = new Model
   meta:
-    table: '天气'
-    repo: 'pg'
-    cache: 'redis'
+    table: 'upcloud_group'
+    repo: 'default'
+    # cache: 'redis'
     fields: [
-      {name: 'id', type: 'integer', column: 'id', primkey: true}
-      {name: 'city', type: 'string', column: '城市'}
-      {name: 'lowTemp', type: 'number', column: '最低气温'}
-      {name: 'highTemp', type: 'number', column: '最高气温'}
-      {name: 'rain', type: 'number', column: '降水量'}
-      {name: 'date', type: 'timestamp', column: '日期'}
+      {name: 'id', type: 'integer', primkey: true, wait: true}
+      {name: 'name', type: 'string'}
+      {name: 'user_ids', type: 'json'}
+      {name: 'owner_id', type: 'integer'}
+      {name: 'admin_ids', type: 'json'}
+      {name: 'created_at', type: 'timestamp'}
+      {name: 'updated_at', type: 'timestamp'}
     ]
 
-# p = Q.all [
-#   User.find(age__gt: 99).all()
-#   User.find(age__lt: 20).all()
-#   User.find(age__gt: 20).all()
-# ]
+exports.File = File = new Model
+  meta:
+    table: 'upcloud_file'
+    repo: 'default'
+    # cache: 'redis'
+    fields: [
+      {name: 'id', type: 'integer', primkey: true, wait: true}
+      {name: 'name', type: 'string'}
+      {name: 'user_id', type: 'integer'}
+      {name: 'group_id', type: 'integer'}
+      {name: 'parent_directory_id', type: 'integer'}
+      {name: 'group_parent_directory_id', type:'integer'}
+      {name: 'version_of', type: 'integer'}
+      {name: 'private', type: 'string'}
+      {name: 'bucket', type: 'string'}
+      {name: 'uri', type: 'string'}
+      {name: 'status', type: 'string'}
+      {name: 'created_at', type: 'timestamp'}
+      {name: 'updated_at', type: 'timestamp'}
+    ]
+  deleteAll: (file_id)->
+    deferred = Q.defer()
+    raw_sql = "DELETE FROM #{@$table} WHERE id = ? OR version_of = ?"
+    @$repo.query raw_sql, [file_id, file_id], (err, result)->
+      if err
+        deferred.reject err
+      else
+        deferred.resolve result
+      return deferred.promise
+
+exports.Directory = Directory = new Model
+  meta:
+    table: 'upcloud_directory'
+    repo: 'default'
+    # cache: 'redis'
+    fields: [
+      {name: 'id', type: 'integer', primkey: true, wait: true}
+      {name: 'user_id', type: 'integer'}
+      {name: 'group_id', type: 'integer'}
+      {name: 'name', type: 'string'}
+      # {name: 'sub_directory_idss', type: 'json'}
+      {name: 'parent_directory_id', type: 'integer'}
+      {name: 'group_parent_directory_id', type:'integer'}
+      # {name: 'file_ids', type: 'json'}
+      {name: 'created_at', type: 'timestamp'}
+      {name: 'updated_at', type: 'timestamp'}
+    ]
 
 
-User.find(
-  userId__gt: 990
-).all()
-.then (result)->
-  console.log result
-.fail (err)->
-  console.log 'yep'+err
-
-# UpUser = new Model
-#   meta:
-#     table: 'upcloud_user'
-#     repo: 'mysql'
-#     cache: 'redis'
-#     fields: [
-#       {name: 'id', type: 'integer', primkey: true, wait: true}
-#       {name: 'email', type: 'string', validator: new Validators.email }
-#       {name: 'password', type: 'string', required: 'true'}
-#       {name: 'created_at', type: 'timestamp'}
-#       {name: 'updated_at', type: 'timestamp'}
-#     ]
-
-
-# time = new Date
-
-# u = UpUser.new
-#   email     : 'rankjie@gmail.com'
-#   password  : '405d3b8e375466aadad099d7ab5ab1cc'
-#   created_at: time
-#   updated_at: time
-
-# u.save()
-# .then (re)->
-#   console.log re
-#   console.log u
-# , (err)->
-#   console.log err
-
-
-
-# u = User.new 
-#   # userId: 990
-#   name:   '02号测试人员'
-#   email:  '1@a.cn'
-#   age:    20
-
-# u.save()
-# .then (re)->
-#   console.log  re
-# , (err)->
-#   console.log err
-
-# date = new Date()
-# console.log  date.toISOString()
-
-# w = Weather.new
-#   id:   11
-#   city: '蘑菇囤儿4'
-#   lowTemp: '-19'
-#   highTemp: '27'
-#   rain: '200'
-#   date: new Date
-
-# Weather.find('城市 = :city and 降水量 > :rain')
-# .set(city: '驻马店', rain: 199).all()
-# .then (result)->
-#   console.log result
-# , (err)->
-#   console.log err
-
-# w.city = '驻马店'
-
-# w.update()
-# .then (result)->
-#   console.log 're:'+result
-# , (err)->
-#   console.log err
-
-# Weather.find(city: '蘑菇囤儿2').all()
-# .then (result)->
-#   result.delete()
-#   .then (result)->
-#     console.log result
-#   , (err) ->
-#     console.log err
-# , (err)->
-#   console.log err
-
-
-# w.save()
-# .then (result)->
-#   console.log result
-# , (err) ->
-#   console.log err.toString()
-
-# u.save()
-# .then (result)->
-#   console.log result
-# , (err) ->
-#   console.log err.toString()
-
-
-# Weather.find(city: 'HangZhou').all()
-# .then (result)->
-#   console.log 'result----->'
-#   console.log result
-# , (err) ->
-#   console.log 'error----->'
-#   console.log err
-
-
-# User.findByUserId(83)
-# .then (u) ->
-#   console.log '---------------------------'
-#   console.log u
-# , (err) ->
-#   console.log err
-
-
-# User.find(age__gt:98).all()
-# .then (u) ->
-#   console.log '---------------------------'
-#   console.log u
-# , (err) ->
-#   console.log err
-
+Group.find(
+  id: 1
+).first()
+.then (group)->
+  g = group[0]
+  g['admin_ids'].push 33
+  g.update()
+  .then (re)->
+    console.log re
+  , (err)->
+    console.log err
+, (err)->
+  console.log err

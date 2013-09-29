@@ -50,6 +50,18 @@ fieldTypes['string'] = class StringField extends Field
   defaultValue: ->
     return ''
 
+fieldTypes['boolean'] = class StringField extends Field
+  toDB: (val) ->
+    return null if not val?
+    return String(val)
+
+  fromDB: (val) ->
+    return false if not val?
+    return Boolean(val)
+
+  defaultValue: ->
+    return null
+
 fieldTypes['timestamp'] = class TimestampField extends Field
   toDB: (val) ->
     if not val?
