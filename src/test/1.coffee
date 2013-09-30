@@ -27,6 +27,7 @@ exports.User = User = new Model
       {name: 'id', type: 'integer', primkey: true, wait: true}
       {name: 'email', type: 'string'}
       {name: 'password', type: 'string'}
+      {name: 'group_ids', type: 'json'}
       {name: 'created_at', type: 'timestamp'}
       {name: 'updated_at', type: 'timestamp'}
     ]
@@ -94,17 +95,19 @@ exports.Directory = Directory = new Model
       {name: 'updated_at', type: 'timestamp'}
     ]
 
+a = []
 
-Group.find(
+a.push Group.find(
   id: 1
 ).first()
-.then (group)->
-  g = group[0]
-  g['admin_ids'].push 33
-  g.update()
-  .then (re)->
-    console.log re
-  , (err)->
-    console.log err
+
+a.push Group.find(
+  id: 3
+).first()
+
+p = Q.all a
+
+p.then (res)->
+  console.log res[0]
 , (err)->
   console.log err

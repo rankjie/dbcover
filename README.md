@@ -53,6 +53,7 @@ User = new Model
     table: 'users'
     repo: 'pg'   # default repo name is 'default'
     cache: 'default' # leave meta.cache blank or set it false to disable caching
+    ttl: 10  # cache expire time(seconds), optional
     fields: [
       {name: 'userId',  type: 'string', column: 'user_id', required: true}
       {name: 'email',   type: 'string', validator: 'email'}

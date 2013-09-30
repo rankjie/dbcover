@@ -5,7 +5,7 @@ QueryTable    = require './querytable'
 Q             = require 'q'
 
 class Instance
-  constructor: (table, pks, nameToField , vals, db, cache, userDefineMethods, primkeys) ->
+  constructor: (table, pks, nameToField , vals, db, cache, userDefineMethods, primkeys, ttl) ->
     # console.log arguments
     @$table       = table
     @$pks         = _.cloneDeep pks
@@ -13,7 +13,8 @@ class Instance
     @$db          = db
     @$cache       = cache
     @$primkeys    = primkeys
-
+    @$ttl         = ttl
+    
     for name, field of @$nameToField
       # 按照name把键值都存下来，只能透过name访问，不能直接用column来访问
       # 同时也把这个初始值存到field里面，update的时候就能用了
@@ -25,7 +26,7 @@ class Instance
       Instance.prototype[method.name] = method.body
   
   save: ->
-    queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
+    queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField, @$ttl
     deferred = Q.defer()
     validationResult = @validate()
     unless validationResult.error?
@@ -40,7 +41,7 @@ class Instance
     return deferred.promise
 
   update: ->
-    queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
+    queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToFieldm, @$ttl
     validationResult = @validate()
     deferred = Q.defer()
     unless validationResult.error?
@@ -55,7 +56,7 @@ class Instance
 
 
   delete: ->
-    queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField
+    queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField, @$ttl
     deferred = Q.defer()
     queryTable.delete(@)
     .then (result)->

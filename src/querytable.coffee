@@ -7,16 +7,15 @@ Q             = require 'q'
 replace_char = '?'
 prefix       = ':'
 
-defaultTTL = 60
 
 class QueryTable
-  constructor: (table, db, cache, model, nameToField) ->
+  constructor: (table, db, cache, model, nameToField, ttl) ->
     @db          = db
     @cache       = cache
     @table       = table
-    @model       = model if model
+    @model       = model ? null
     @nameToField = nameToField
-
+    @ttl         = ttl
   # 只有model才有的方法
   find: (inputRawSQL, condition) ->
     # SELECT id,name,mail..... FROM users
@@ -238,17 +237,18 @@ class QueryTable
               else
                 if rows.length > 0
                   # 先把sql作为key，存入cache
-                  self.cache.set cacheKey, JSON.stringify(rows), defaultTTL, (err, response) ->
+                  self.cache.set cacheKey, JSON.stringify(rows), self.ttl, (err, response) ->
                     # console.log  '写入cache'
                     # 把data变成object再返回
                     deferred.resolve dbToInstance rows
                   # 把每个查到的对象都存入cache
                   for obj in dbToInstance rows
-                    self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), defaultTTL
+                    self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), self.ttl
                 else
                   deferred.resolve dbToInstance rows
           # cache有的话
           else
+            console.log 'found in cache'
             deferred.resolve cacheToInstance data[cacheKey]
       # 没设置cache的话
       else
@@ -283,7 +283,7 @@ class QueryTable
           #   self._objToSave[name] = rows.insertId
           #   self._cacheData[name] = self._objToSave.$nameToField[name].toDB self._objToSave[name]
           # 存入cache
-          self.cache.set self.cacheKey(self._objToSave), JSON.stringify(self._cacheData), defaultTTL, (err, response) ->
+          self.cache.set self.cacheKey(self._objToSave), JSON.stringify(self._cacheData), self.ttl, (err, response) ->
             deferred.reject rows if err?
             deferred.resolve rows
         else
@@ -296,9 +296,9 @@ class QueryTable
         if self.cache
           self.cache.del self._cachekey, (err, numberOfRowsDeleted) ->
             deferred.reject err if err
-            deferred.resolve numberOfRowsDeleted
+            deferred.resolve true
         else
-          deferred.resolve numberOfRowsDeleted
+          deferred.resolve true
 
     if self._queryType is 'update'
       self.db.query sql, (err, rows) ->

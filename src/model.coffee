@@ -10,6 +10,8 @@ QueryTable         = require './querytable'
 repoGroup  = {}
 cacheGroup = {}
 
+defaultTTL = 60
+
 class Observe
   define: (cata, config)->
     repoGroup[config.name]  = db    config.provider if cata is 'repo'
@@ -42,11 +44,12 @@ class Model
     @$indices    = dataDefine.meta.indices
     @$table      = dataDefine.meta.table
     @$repo       = repoGroup[dataDefine.meta.repo] or repoGroup['default']
-
+    @$ttl        = dataDefine.meta.ttl ? defaultTTL
     @$cache      = false
     @$cache      = cacheGroup[dataDefine.meta.cache] or cacheGroup['default'] if dataDefine.meta.cache
     
-    @$nameToField = {}
+
+    @$nameToField = {} 
     for f in dataDefine.meta.fields
       @$nameToField[f.name] = createField _.cloneDeep f
       # 要把validator的prototype拷贝过去，因为cloneDeep不拷贝prototype
@@ -107,11 +110,11 @@ class Model
   # 生产instance
   # User.new
   new: (vals)->
-    new Instance @$table, @$indices, @$nameToField, vals, @$repo, @$cache, @$userDefineMethods, @primkeys
+    new Instance @$table, @$indices, @$nameToField, vals, @$repo, @$cache, @$userDefineMethods, @primkeys, @$ttl
 
   find: (rawSQL, condition) ->
     # 同new
-    queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField
+    queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl
     # 传入的参数有三种情况：
     # 'age > ? and created > ?', [30, 234242]
     # 'age > :age and created > :created'
