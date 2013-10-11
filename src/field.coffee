@@ -52,12 +52,16 @@ fieldTypes['string'] = class StringField extends Field
 
 fieldTypes['boolean'] = class StringField extends Field
   toDB: (val) ->
-    return null if not val?
-    return String(val)
+    if val is 'true' or val is true
+      return 'true'
+    else
+      return 'false'
 
   fromDB: (val) ->
-    return false if not val?
-    return Boolean(val)
+    if val is 'true' or val is true
+      return true 
+    else
+      return false
 
   defaultValue: ->
     return null

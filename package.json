@@ -1,6 +1,6 @@
 {
   "name": "dbcover",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Object Relational Mapping With Cache(Memcached/Redis) Enabled For Mysql/PostgreSQL/more.",
   "main": "lib/model.js",
   "scripts": {
