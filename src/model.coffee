@@ -114,7 +114,6 @@ class Model
 
   find: (rawSQL, condition) ->
     # 同new
-    console.log 'Model.find is triggered'
     queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl
     # 传入的参数有三种情况：
     # 'age > ? and created > ?', [30, 234242]
