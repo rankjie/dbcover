@@ -1,7 +1,6 @@
 db = require './db/db'
 cache = require './cache/cache'
 sql = require 'squel'
-logger = require 'node-simple-logger'
 
 mysql = db
   type: 'mysql'
@@ -35,7 +34,6 @@ redis = cache
 console.log s1.toString()
 
 mysql.query s1.toString(), (err, rows)->
-  logger.info err
   console.log JSON.stringify(rows)
   redis.set s1.toString(), JSON.stringify(rows), (err, response) ->
     console.log err
@@ -53,7 +51,6 @@ mysql.query s1.toString(), (err, rows)->
 
 console.log s2.toString()
 pg.query s2.toString(), (err, rows)->
-  logger.info err
   console.log JSON.stringify rows
   console.log 'end pg'
   pg.end()
