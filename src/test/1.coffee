@@ -94,20 +94,33 @@ exports.Directory = Directory = new Model
       {name: 'created_at', type: 'timestamp'}
       {name: 'updated_at', type: 'timestamp'}
     ]
+  sayHi: ()->
+    console.log 'hi~~'
 
-a = []
 
-a.push Group.find(
-  id: 1
-).first()
+d = Group.new
+  name: 'Gggroup'
+  user_ids: [123123,123123]
+  admin_ids: [1,2]
 
-a.push Group.find(
-  id: 3
-).first()
 
-p = Q.all a
+d.sayHi()
 
-p.then (res)->
-  console.log res[0]
-, (err)->
-  console.log err
+Group.sayHi()
+
+# a = []
+
+# a.push Group.find(
+#   id: 1
+# ).first()
+
+# a.push Group.find(
+#   id: 3
+# ).first()
+
+# p = Q.all a
+
+# p.then (res)->
+#   console.log res[0]
+# , (err)->
+#   console.log err

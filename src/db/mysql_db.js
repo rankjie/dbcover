@@ -13,6 +13,8 @@ MySQL = (function() {
   MySQL.prototype.query = function(sql, args, callback) {
     return this.pool.getConnection(function(err, connection) {
       var k, v;
+      console.log(sql);
+      console.log(args);
       if (err) {
         console.log('Error when getting MySQL connection:' + err);
       }
