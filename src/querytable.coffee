@@ -49,13 +49,13 @@ class QueryTable
     @_queryType         = 'insert'
     @_cacheData         = {}
     @_fieldsToInsert    = []
-    @_wait              = []
+    @_auto              = []
     @_objToSave         = obj
     deferred = Q.defer()
     for name, field of obj.$nameToField
       # 如果有field需要等save之后才能获得（id），那就先不载入这个数组，并且记录下来，这样等下存完了就可以抓到完整放进cache
-      if field.wait
-        @_wait.push name
+      if field.auto
+        @_auto.push name
       else
         # 把数据存到cacheData，用于存入cache
         @_cacheData[name] = field.toDB obj[name]
@@ -273,15 +273,11 @@ class QueryTable
           deferred.reject err
           return deferred.promise
 
-        # 取出wait的ID
-        for name in self._wait
+        # 取出auto的ID
+        for name in self._auto
           self._objToSave[name] = rows.insertId
           self._cacheData[name] = self._objToSave.$nameToField[name].toDB self._objToSave[name]
         if self.cache
-          # # 取出wait的ID
-          # for name in self._wait
-          #   self._objToSave[name] = rows.insertId
-          #   self._cacheData[name] = self._objToSave.$nameToField[name].toDB self._objToSave[name]
           # 存入cache
           self.cache.set self.cacheKey(self._objToSave), JSON.stringify(self._cacheData), self.ttl, (err, response) ->
             deferred.reject rows if err?

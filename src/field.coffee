@@ -7,7 +7,7 @@ class Field
     @validator = attrs.validator ? null
     @required = attrs.required ? false
     @primkey  = attrs.primkey ? false
-    @wait     = attrs.wait ? false
+    @auto     = attrs.auto ? false
 
   say: ->
     console.log '喵'

@@ -56,6 +56,8 @@ User = new Model
     cache: 'default' # leave meta.cache blank or set it false to disable caching
     ttl: 10  # cache expire time(seconds), optional
     fields: [
+      # set auto to true to support auto increment columns
+      {name: 'id', type: 'integer', auto: true} 
       {name: 'userId',  type: 'string', column: 'user_id', required: true}
       {name: 'email',   type: 'string', validator: 'email'}
       {name: 'age',     type: 'integer', validator: new IntegerValidator(10, 100)}
