@@ -8,7 +8,7 @@ Usage (in coffeescript):
 
 ```coffeescript
 
-{Obeserve}          = require 'dbcover'
+{Observe}          = require 'dbcover'
 {Model}             = require 'dbcover'
 # Require whatever validator you need. Full list of validators are in src/validators
 {IntegerValidator}  = require('dbcover').Validator
