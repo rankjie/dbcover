@@ -8,10 +8,9 @@ Usage (in coffeescript):
 
 ```coffeescript
 
-{Observe, Model}   = require 'dbcover'
+{Observe, Model, Validators}   = require 'dbcover'
 # Require whatever validator you need.
-# List of validators: IntegerValidators, StringValidators, EmailValidators, NullValidators
-{IntegerValidator} = require('dbcover').Validator
+# List of validators: integer, string, email, required
 
 # Define database connection
 Observe.define 'repo',
@@ -56,7 +55,7 @@ User = new Model
       {name: 'id', type: 'integer', auto: true, primkey: true}
       {name: 'userId',  type: 'string', column: 'user_id', required: true}
       {name: 'email',   type: 'string', validator: 'email'}
-      {name: 'age',     type: 'integer', validator: new IntegerValidator(10, 100)}
+      {name: 'age',     type: 'integer', validator: new Validators.integer(10, 100)}
       {name: 'extra',   type: 'json'}
       {name: 'created', type: 'timestamp'}
       {name: 'examplePrimkey', type: 'string', primkey: true}

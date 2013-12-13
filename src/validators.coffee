@@ -45,7 +45,7 @@ Validators.required = class NullValidator
 
   doValidate: (str)->
     try
-      check(str).isNull()
+      check(str).notNull()
     catch e
       @result.error = e
     return @result
