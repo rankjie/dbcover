@@ -37,7 +37,7 @@ class QueryTable
     @list 0, 0
 
   first: ->
-    @list 0, 1
+    @list(0, 1)[0]
 
   list: (offset, limit) ->
     @_offset = offset or 0
