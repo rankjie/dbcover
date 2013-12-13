@@ -1,4 +1,3 @@
-logger        = require 'node-simple-logger'
 sqlbuilder    = require 'squel'
 _             = require 'lodash'
 Q             = require 'q'
