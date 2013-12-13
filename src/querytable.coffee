@@ -37,7 +37,8 @@ class QueryTable
     @list 0, 0
 
   first: ->
-    @list(0, 1)[0]
+    @_first = true
+    @list 0, 1
 
   list: (offset, limit) ->
     @_offset = offset or 0
@@ -239,7 +240,9 @@ class QueryTable
                   self.cache.set cacheKey, JSON.stringify(rows), self.ttl, (err, response) ->
                     # console.log  '写入cache'
                     # 把data变成object再返回
-                    deferred.resolve dbToInstance rows
+                    d = dbToInstance rows
+                    d = d[0] if self._first
+                    deferred.resolve d
                   # 把每个查到的对象都存入cache
                   for obj in dbToInstance rows
                     self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), self.ttl
@@ -247,8 +250,9 @@ class QueryTable
                   deferred.resolve dbToInstance rows
           # cache有的话
           else
-            console.log 'found in cache'
-            deferred.resolve cacheToInstance data[cacheKey]
+            d = cacheToInstance data[cacheKey]
+            d = d[0] if self._first
+            deferred.resolve d
       # 没设置cache的话
       else
         # 直接从db找
