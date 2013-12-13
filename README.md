@@ -8,14 +8,10 @@ Usage (in coffeescript):
 
 ```coffeescript
 
-{Observe}          = require 'dbcover'
-{Model}             = require 'dbcover'
-# Require whatever validator you need. Full list of validators are in src/validators
-{IntegerValidator}  = require('dbcover').Validator
-# Or, require them all. Then, you can define a IntegerValidation with Validator.integer
-# {Validator} = require('dbcover').Validator
-# IntegerValidator = Validator.integer
-
+{Observe, Model}   = require 'dbcover'
+# Require whatever validator you need.
+# List of validators: IntegerValidators, StringValidators, EmailValidators, NullValidators
+{IntegerValidator} = require('dbcover').Validator
 
 # Define database connection
 Observe.define 'repo',
@@ -57,7 +53,7 @@ User = new Model
     ttl: 10  # cache expire time(seconds), optional
     fields: [
       # set auto to true to support auto increment columns
-      {name: 'id', type: 'integer', auto: true} 
+      {name: 'id', type: 'integer', auto: true, primkey: true}
       {name: 'userId',  type: 'string', column: 'user_id', required: true}
       {name: 'email',   type: 'string', validator: 'email'}
       {name: 'age',     type: 'integer', validator: new IntegerValidator(10, 100)}
@@ -65,10 +61,9 @@ User = new Model
       {name: 'created', type: 'timestamp'}
       {name: 'examplePrimkey', type: 'string', primkey: true}
     ]
-    # indices could be blank as long as you specified primkey(s) inside fields
+    # primkey(s) with one or more columns. remember to use the name you definded above, not the real column name.
     indices: [
       {name: 'pk',    fields: ['userId', 'age'], unique: true}
-      {name: 'email', fields: 'email', unique: true}
     ]
 
   sayHi: () ->
@@ -76,14 +71,12 @@ User = new Model
 
   rename: (name, id)->
     deferred = Q.defer()
-    raw_sql = "UPDATE #{@$table} SET name = ?, updated_at='#{(new Date).toISOString()}' WHERE id = ?"
+    raw_sql = "UPDATE #{@$table} SET name = ?, updated_at='#{new Date}' WHERE id = ?"
     # You may use @$repo.query to make customized queries.
     # Use ? or :var instead of raw variables to avoid SQL injection.
     @$repo.query raw_sql, [name, id], (err, result)->
-      if err
-        deferred.reject err
-      else
-        deferred.resolve result
+      deferred.reject err if err?
+      deferred.resolve result
     return deferred.promise
 
 
@@ -107,15 +100,14 @@ promise = user.delete()
 
 
 # Query 
-# All promises returned by Query or findBy, will be resolved with a set of instances
+# All promises returned by Query or findBy, will be resolved with a set of instances ( first()/findByIndeices will return just one object )
 # Or, rejected with errors.
 promise = User.find(userId: 123).first()
-# You can append '__gt' or '__lt' to the field name, that equals to '>' and '<'
+# You can append '__gt' or '__lt' to the field name, that would equals to '>' and '<'
 promise = User.find(age: 30, created__gt: 2334343).first()
-promise = User.find(age: 30, created__lt: 2334343).first()
+promise = User.find(age__lt: 30, created: 2334343).first()
 # Get all the entries
 promise = User.find(age: 30).all()
-
 # Find by primkeys 
 promise = User.findByPk(userID: 234, age: 99)
 promise = User.findByExamplePrimkey('someValue')

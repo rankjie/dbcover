@@ -1,7 +1,7 @@
 {
   "name": "dbcover",
-  "version": "0.2.4",
-  "description": "Object Relational Mapping With Cache(Memcached/Redis) Enabled For Mysql/PostgreSQL/more. [under development]",
+  "version": "0.2.5",
+  "description": "A Promise/A+ Based Object Relational Mapping Module With Cache(Memcached/Redis) Enabled For Mysql/PostgreSQL/more. [under development]",
   "main": "lib/model.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
