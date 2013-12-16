@@ -247,7 +247,7 @@ class QueryTable
                   for obj in dbToInstance rows
                     self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), self.ttl
                 else
-                  deferred.resolve dbToInstance rows
+                  deferred.resolve null
           # cache有的话
           else
             d = cacheToInstance data[cacheKey]
