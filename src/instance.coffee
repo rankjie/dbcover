@@ -29,11 +29,12 @@ class Instance
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField, @$ttl
     deferred = Q.defer()
     validationResult = @validate()
+    self = @
     unless validationResult.error?
       # 没有error就认为没有出错
       queryTable.save(@)
       .then (result)->
-        deferred.resolve result
+        deferred.resolve @
       , (err)->
         deferred.reject err
     else
