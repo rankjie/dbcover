@@ -34,7 +34,7 @@ class Instance
       # 没有error就认为没有出错
       queryTable.save(@)
       .then (result)->
-        deferred.resolve @
+        deferred.resolve self
       , (err)->
         deferred.reject err
     else
