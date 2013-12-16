@@ -1,6 +1,8 @@
 # A Simple ORM Module
 ## !UNDER DEVELOPMENT!
 
+## GO TO ISSUES TO SEE KNOWN BUGS.
+
 Install:
 `npm install dbcover`
 
