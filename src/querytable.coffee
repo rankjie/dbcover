@@ -85,7 +85,7 @@ class QueryTable
     @pkStr = []
     for k in obj.$primkeys
       for name in k.keyName
-        @pkStr.push obj.$nameToField[name].column + ' = ' + obj.$nameToField[name].val
+        @pkStr.push obj.$nameToField[name].column + " = '" + obj.$nameToField[name].val + "'"
     # 找出需要做update的数据
     for name, field of obj.$nameToField when obj[name] isnt field.val
       # 更新field.val为最新的值

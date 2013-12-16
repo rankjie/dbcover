@@ -52,7 +52,7 @@ class Instance
       , (err)->
         deferred.reject err
     else
-      deferred.reject result.error
+      deferred.reject validationResult.error
     return deferred.promise
 
 
