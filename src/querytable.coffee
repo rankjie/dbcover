@@ -28,6 +28,8 @@ class QueryTable
     return @
 
   orderBy: (args, order) ->
+    @_orderBy = []
+    @_order   = []
     @_orderBy.push args
     _order     = if order.toUpperCase() is 'DESC' then false else true
     @_order.push _order
@@ -51,7 +53,6 @@ class QueryTable
     @_fieldsToInsert    = []
     @_auto              = []
     @_objToSave         = obj
-    deferred = Q.defer()
     for name, field of obj.$nameToField
       # 如果有field需要等save之后才能获得（id），那就先不载入这个数组，并且记录下来，这样等下存完了就可以抓到完整放进cache
       if field.auto
@@ -67,21 +68,11 @@ class QueryTable
           value : field.toDB(obj[name])
 
     @_cachekey = @cacheKey(obj)
-    # console.log 'cacheData: '+ JSON.stringify @_cacheData
-    # console.log 'cacheKey: ' + @_cachekey
-
     @query()
-    .then (re) ->
-      deferred.resolve re
-    , (err)->
-      deferred.reject err
-
-    return deferred.promise
 
   update: (obj) ->
     @_queryType = 'update'
     @_fieldsToUpdate = []
-    deferred = Q.defer()
     @pkStr = []
     for k in obj.$primkeys
       for name in k.keyName
@@ -97,17 +88,10 @@ class QueryTable
     @_cachekey = @cacheKey(obj)
 
     @query()
-    .then (re) ->
-      deferred.resolve re
-    , (err)->
-      deferred.reject err
-
-    return deferred.promise
 
   delete: (obj)->
     @_queryType = 'delete'
     @pkStr = []
-    deferred = Q.defer()
     for k in obj.$primkeys
       for name in k.keyName
         # 因为instance可能在delete之前有修改过变量值，但是没有update。这时候数据库的数据是老的，所以要用
@@ -115,12 +99,6 @@ class QueryTable
         @pkStr.push obj.$nameToField[name].column + ' = ' + obj.$nameToField[name].val
      
     @query()
-    .then (re) ->
-      deferred.resolve re
-    , (err)->
-      deferred.reject err
-
-    return deferred.promise
 
   toSQL: ->
     if @_queryType is 'find'
@@ -128,7 +106,9 @@ class QueryTable
       for name, field of @nameToField
         sql = sql.field(field.column, name)
 
-      if toType(@_inputRawSQL) is 'string'
+      if not @_inputRawSQL? 
+        sql = sql
+      else if toType(@_inputRawSQL) is 'string'
         sql = sql.where(@_inputRawSQL)
       else if toType(@_inputRawSQL) is 'object'
         for k, v of @_inputRawSQL

@@ -69,8 +69,11 @@ fieldTypes['boolean'] = class StringField extends Field
 fieldTypes['timestamp'] = class TimestampField extends Field
   toDB: (val) ->
     if not val?
+      return val;
+    try 
+      return (new Date(val)).toISOString()
+    catch e
       return null
-    return (new Date(val)).toISOString()
 
   fromDB: (val) ->
     if not val?

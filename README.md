@@ -114,6 +114,11 @@ promise = User.findByPk(userID: 234, age: 99)
 promise = User.findByExamplePrimkey('someValue')
 
 
+# list all the data
+promise = User.find()
+  .orderBy('created', 'desc')
+  .all()
+
 # list from 0 to 10
 promise = User.find('age > ? and created > ?', [30, 234242])
   .orderBy('created', 'desc')
