@@ -88,12 +88,7 @@ fieldTypes['json'] = class JSONField extends Field
     return JSON.stringify val
   
   fromDB: (val) ->
-    if not val?
-      return val
-    try
-      return JSON.parse val.toString()
-    catch e
-      return null
+    return val
 
   defaultValue: ->
     return {}
