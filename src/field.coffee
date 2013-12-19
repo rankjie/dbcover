@@ -85,10 +85,16 @@ fieldTypes['timestamp'] = class TimestampField extends Field
 
 fieldTypes['json'] = class JSONField extends Field
   toDB: (val) ->
+    return val if not val?
     return JSON.stringify val
   
   fromDB: (val) ->
-    return val
+    return val if not val?
+    try 
+      return JSON.parse(val.toString())
+    catch e
+      console.log '[dbcover] Parsing JSON field,', e , '. NOTICE: Will return `null`'
+      return null
 
   defaultValue: ->
     return {}

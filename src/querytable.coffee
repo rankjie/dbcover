@@ -214,16 +214,13 @@ class QueryTable
                 deferred.reject err
               else
                 if rows.length > 0
+                  datas = dbToInstance rows
                   # 先把sql作为key，存入cache
                   self.cache.set cacheKey, JSON.stringify(rows), self.ttl, (err, response) ->
-                    # console.log  '写入cache'
-                    # 把data变成object再返回
-                    d = dbToInstance rows
-                    d = d[0] if self._first
-                    deferred.resolve d
-                  # 把每个查到的对象都存入cache
-                  for obj in dbToInstance rows
-                    self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), self.ttl
+                    # 把每个查到的对象都存入cache
+                    for obj in datas
+                      self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), self.ttl
+                    deferred.resolve if self._first then datas[0] else datas
                 else
                   deferred.resolve null
           # cache有的话
