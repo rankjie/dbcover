@@ -96,7 +96,7 @@ class QueryTable
       for name in k.keyName
         # 因为instance可能在delete之前有修改过变量值，但是没有update。这时候数据库的数据是老的，所以要用
         # nameToField里面存的变量（用于在update的时候找出需要做set的column）
-        @pkStr.push obj.$nameToField[name].column + ' = ' + obj.$nameToField[name].val
+        @pkStr.push obj.$nameToField[name].column + " = '" + obj.$nameToField[name].val + "'"
      
     @query()
 
@@ -148,11 +148,9 @@ class QueryTable
         # console.log f
         sql = sql.set f.column, f.value ? null
 
-    # need fix!
     else if @_queryType is 'delete'
       sql = sqlbuilder.delete().from(@table)
       for str in @pkStr
-        # 为什么indices的field是array？pk对应多个fields？
         sql = sql.where(str)
 
 
