@@ -91,10 +91,9 @@ fieldTypes['json'] = class JSONField extends Field
   fromDB: (val) ->
     return val if not val?
     try 
-      return JSON.parse(val.toString())
+      return JSON.parse val
     catch e
-      console.log '[dbcover] Parsing JSON field,', e , '. NOTICE: Will return `null`'
-      return null
+      return val
 
   defaultValue: ->
     return {}

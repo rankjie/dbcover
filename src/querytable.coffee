@@ -175,15 +175,21 @@ class QueryTable
     deferred = Q.defer()
     sql = self.toSQL()
 
-    cacheToInstance = (data) ->
-      # console.log data
-      return dbToInstance JSON.parse data
+    cacheToInstance = (rows) ->
+      console.log '[dbcover] Found data in cache.'
+      instances = []
+      for row in JSON.parse rows
+        for name, field of self.nameToField
+          row[name] = field.fromDB row[name]
+        instances.push self.model.new row
+      return instances
 
     instanceToCache = (obj) ->
       # console.log obj.$cacheData
       return JSON.stringify obj.$cacheData
 
     dbToInstance = (rows) ->
+      console.log '[dbcover] Load data from DB.'
       instances = []
       for row in rows
         for name, field of self.nameToField
