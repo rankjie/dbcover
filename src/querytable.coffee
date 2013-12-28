@@ -61,7 +61,7 @@ class QueryTable
         # 把数据存到cacheData，用于存入cache
         @_cacheData[name] = field.toDB obj[name]
         # 因为save之前可能数据已经更改过，所以更新一下field.val
-        field.val = obj[name]
+        field.val = _.cloneDeep obj[name]
         # 数据存入fieldsToInsert，用于存入db
         @_fieldsToInsert.push
           column: field.column
@@ -78,15 +78,15 @@ class QueryTable
       for name in k.keyName
         @pkStr.push obj.$nameToField[name].column + " = '" + obj.$nameToField[name].val + "'"
     # 找出需要做update的数据
-    for name, field of obj.$nameToField when obj[name] isnt field.val
+    for name, field of obj.$nameToField when not _.isEqual(obj[name], field.val)
       # 更新field.val为最新的值
       field.val = obj[name]
       @_fieldsToUpdate.push 
         column : field.column
         value  : field.toDB(obj[name])
+    return Q.resolve() if @_fieldsToUpdate.length is 0
     # 取出一会儿要从cache里删除的key
     @_cachekey = @cacheKey(obj)
-
     @query()
 
   delete: (obj)->
@@ -145,7 +145,6 @@ class QueryTable
     else if @_queryType is 'insert'
       sql = sqlbuilder.insert().into(@table)
       for f in @_fieldsToInsert
-        # console.log f
         sql = sql.set f.column, f.value ? null
 
     else if @_queryType is 'delete'
@@ -259,8 +258,9 @@ class QueryTable
 
         # 取出auto的ID
         for name in self._auto
-          self._objToSave[name] = rows.insertId
-          self._cacheData[name] = self._objToSave.$nameToField[name].toDB self._objToSave[name]
+          self._objToSave[name]                  = rows.insertId
+          self._objToSave.$nameToField[name].val = rows.insertId
+          self._cacheData[name]                  = self._objToSave.$nameToField[name].toDB self._objToSave[name]
         if self.cache
           # 存入cache
           self.cache.set self.cacheKey(self._objToSave), JSON.stringify(self._cacheData), self.ttl, (err, response) ->

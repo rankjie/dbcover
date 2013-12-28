@@ -55,7 +55,6 @@ class Instance
       deferred.reject validationResult.error
     return deferred.promise
 
-
   delete: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField, @$ttl
     deferred = Q.defer()
