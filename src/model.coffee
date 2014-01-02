@@ -93,12 +93,16 @@ class Model
           keyName: keyName
     
     # 实现findByIndex
+    # 自动将user_id/blog-id之类的转化为驼峰形式
     capitaliseFirstLetter = (str) ->
       return str.charAt(0).toUpperCase() + str.slice(1)
 
+    camelCased = (str)->
+      return str.replace /(-|_)([a-z])/g, (s)-> s[1].toUpperCase()
+
     for key in @primkeys
       ( (key, self)->
-          self['findBy'+capitaliseFirstLetter(key.name)] = (v)->
+          self['findBy'+capitaliseFirstLetter(camelCased(key.name))] = (v)->
             values = {}
             if toType(v) isnt 'object' then values[key.name] = v else values = v
             sqlStr = []
