@@ -2,12 +2,13 @@
 
 class Field
   constructor: (attrs) ->
-    @name = attrs.name
-    @column = attrs.column ? @name
+    @name      = attrs.name
+    @column    = attrs.column ? @name
     @validator = attrs.validator ? null
-    @required = attrs.required ? false
-    @primkey  = attrs.primkey ? false
-    @auto     = attrs.auto ? false
+    @required  = attrs.required ? false
+    @primkey   = attrs.primkey ? false
+    @auto      = attrs.auto ? false
+    @uniq      = attrs.uniq ? false
 
   say: ->
     console.log '喵'

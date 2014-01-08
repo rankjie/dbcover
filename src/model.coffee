@@ -6,6 +6,7 @@ cache              = require './cache/cache'
 Instance           = require './instance'
 QueryTable         = require './querytable'
 {Validators, StringValidator, IntegerValidator, EmailValidator}  = require './validators'
+Q                  = require 'q'
 
 repoGroup  = {}
 cacheGroup = {}
@@ -103,9 +104,19 @@ class Model
             values = {}
             if toType(v) isnt 'object' then values[key.name] = v else values = v
             sqlStr = []
-            for name in key.keyName
-              sqlStr.push self.$nameToField[name].column + " = '" + self.$nameToField[name].toDB values[name] + "'"
-            return self.find(sqlStr.join(' AND ')).first()
+            sqlStr.push self.$nameToField[name].column + " = '" + self.$nameToField[name].toDB values[name] + "'" for name in key.keyName
+            return self.find(sqlStr.join(' AND ')).first() if self.$nameToField[name].uniq
+            self.find(sqlStr.join(' AND ')).all()
+            
+          self['findBy'+camelCased(key.name)+'s'] = (v)->
+            promises = []
+            promises.push self['findBy'+camelCased(key.name)](i) for i in v
+            Q.all(promises).spread ->
+              re = []
+              for result in arguments
+                re = re.concat result if toType(result) is 'array'
+                re.push result if toType(result) is 'object'
+              Q.resolve re
       )(key, @)
 
   # 生产instance
