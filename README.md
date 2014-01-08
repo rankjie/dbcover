@@ -8,7 +8,7 @@ Install:
 
 Common Usage (in coffeescript):
 
-# ```coffeescript
+```coffeescript
 
 {Observe, Model, Validators}   = require 'dbcover'
 # Require whatever validator you need.
@@ -135,4 +135,4 @@ promise = User.find('age > :age and created > :created')
   .orderBy('created', 'desc')
   .first()
 
-# ```
+```
