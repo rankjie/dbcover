@@ -6,9 +6,9 @@
 Install:
 `npm install dbcover`
 
-Usage (in coffeescript):
+Common Usage (in coffeescript):
 
-```coffeescript
+# ```coffeescript
 
 {Observe, Model, Validators}   = require 'dbcover'
 # Require whatever validator you need.
@@ -54,17 +54,16 @@ User = new Model
     ttl: 10  # cache expire time(seconds), optional
     fields: [
       # set auto to true to support auto increment columns
-      {name: 'id', type: 'integer', auto: true, primkey: true}
-      {name: 'userId',  type: 'string', column: 'user_id', required: true}
-      {name: 'email',   type: 'string', validator: 'email'}
+      {name: 'id', type: 'integer', auto: true, primkey: true, uniq: true}
+      {name: 'email',   type: 'string', validator: 'email', primkey: true, uniq: true}
+      {name: 'random_key', type: 'string', primkey: true}
       {name: 'age',     type: 'integer', validator: new Validators.integer(10, 100)}
       {name: 'extra',   type: 'json'}
       {name: 'created', type: 'timestamp'}
-      {name: 'examplePrimkey', type: 'string', primkey: true}
     ]
     # primkey(s) with one or more columns. remember to use the name you definded above, not the real column name.
     indices: [
-      {name: 'pk',    fields: ['userId', 'age'], unique: true}
+      {name: 'pk', fields: ['email', 'age']}
     ]
 
   sayHi: () ->
@@ -79,7 +78,6 @@ User = new Model
       deferred.reject err if err?
       deferred.resolve result
     return deferred.promise
-
 
 # Creating instance
 user = User.new
@@ -101,9 +99,9 @@ promise = user.delete()
 
 
 # Query 
-# All promises returned by Query or findBy, will be resolved with a set of instances ( first()/findByIndeices will return just one object )
+# All promises returned by Query or findBy, will be resolved with a set of instances ( first() and findByIndeices which has `uniq:true` will return just one object )
 # Or, rejected with errors.
-promise = User.find(userId: 123).first()
+promise = User.findById(123)
 # You can append '__gt' or '__lt' to the field name, that would equals to '>' and '<'
 promise = User.find(age: 30, created__gt: 2334343).first()
 promise = User.find(age__lt: 30, created: 2334343).first()
@@ -111,7 +109,8 @@ promise = User.find(age__lt: 30, created: 2334343).first()
 promise = User.find(age: 30).all()
 # Find by primkeys 
 promise = User.findByPk(userID: 234, age: 99)
-promise = User.findByExamplePrimkey('someValue')
+# prim keys like random_key will be transformed to camel case like RandomKey
+promise = User.findByRandomKey('someValue')
 
 
 # list all the data
@@ -136,4 +135,4 @@ promise = User.find('age > :age and created > :created')
   .orderBy('created', 'desc')
   .first()
 
-```
+# ```
