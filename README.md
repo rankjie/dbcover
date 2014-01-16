@@ -51,7 +51,7 @@ User = new Model
     table: 'users'
     repo: 'pg'   # default repo name is 'default'
     cache: 'default' # leave meta.cache blank or set it false to disable caching
-    ttl: 10  # cache expire time(seconds), optional
+    ttl: 10  # cache expire time(seconds), must be set if cache is enabled for this model. if ttl < 1, then no expire time would be applied.
     fields: [
       # set auto to true to support auto increment columns
       {name: 'id', type: 'integer', auto: true, primkey: true, uniq: true}

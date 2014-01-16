@@ -241,11 +241,7 @@ class QueryTable
             # console.log 'db查的时候  出错了'
             deferred.reject err
           else
-            if rows.length > 0
-              deferred.resolve dbToInstance rows
-            else
-              deferred.resolve dbToInstance rows
-
+            deferred.resolve if self._first then dbToInstance(rows)[0] else dbToInstance(rows)
 
     # insert类型
     if self._queryType is 'insert'

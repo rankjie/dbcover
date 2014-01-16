@@ -17,9 +17,11 @@ class memcacheMethods
     #   @mem = new memcache serverString
 
   set: (key, row, ttl, callback) ->
+    _ttl = ttl
     unless callback?
-      ttl = 0
-    @mem.set key, row, ttl, (err) ->
+      _ttl = 0
+      callback = ttl
+    @mem.set key, row, _ttl, (err) ->
       callback err, null  if callback
 
   get: (keys, callback) ->
