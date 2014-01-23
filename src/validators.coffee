@@ -1,5 +1,5 @@
 {toType}  = require './utils'
-{validators} = require 'validator'
+validators = require 'validator'
 
 Validators = {}
 err_msg    = 'value check failed'
