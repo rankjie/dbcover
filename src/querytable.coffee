@@ -87,6 +87,7 @@ class QueryTable
     return Q.resolve() if @_fieldsToUpdate.length is 0
     # 取出一会儿要从cache里删除的key
     @_cachekey = @cacheKey(obj)
+    @_objToUpdate = obj
     @query()
 
   delete: (obj)->
@@ -283,9 +284,9 @@ class QueryTable
           # 从cache里删掉，以后要用的时候再取就是了
           self.cache.del self._cachekey, (err, response) ->
             deferred.reject err if err
-            deferred.resolve null
+            deferred.resolve self._objToUpdate
         else
-          deferred.resolve null
+          deferred.resolve self._objToUpdate
 
     return deferred.promise
 

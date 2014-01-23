@@ -52,6 +52,7 @@ class Instance
       , (err)->
         deferred.reject err
     else
+      console.log 'valid>>>>>>>', validationResult.error
       deferred.reject validationResult.error
     return deferred.promise
 

@@ -1,6 +1,9 @@
 # A Simple ORM Module
 ## !UNDER DEVELOPMENT!
 
+[] Improve cache system.
+[] Rewrite inner code with promise and simplify it.
+
 ## GO TO ISSUES TO SEE KNOWN BUGS.
 
 Install:

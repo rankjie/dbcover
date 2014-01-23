@@ -1,5 +1,5 @@
 {toType}  = require './utils'
-validator = require 'validator'
+{validators} = require 'validator'
 
 Validators = {}
 err_msg    = 'value check failed'
@@ -11,7 +11,7 @@ Validators.integer = class IntegerValidator
     @max = max
 
   doValidate: (num)->
-    @result.error = err_msg if not (validator.isInt(num) and Number(validator) <= @max and Number(validator) >= @min)
+    @result.error = err_msg if not (validators.isInt(num) and Number(validators) <= @max and Number(validators) >= @min)
     return @result
 
 Validators.string = class StringValidator
@@ -21,7 +21,7 @@ Validators.string = class StringValidator
     @max = max
 
   doValidate: (str)->
-    @result.error = err_msg if not validator.isLength(str, @min, @max)
+    @result.error = err_msg if not validators.isLength(str, @min, @max)
     return @result
 
 Validators.email = class EmailValidator
@@ -29,7 +29,7 @@ Validators.email = class EmailValidator
     @result = {}
 
   doValidate: (str)->
-    @result.error = err_msg if not validator.isEmail(str)
+    @result.error = err_msg if not validators.isEmail(str)
     return @result
       
 Validators.required = class NullValidator
@@ -37,7 +37,7 @@ Validators.required = class NullValidator
     @result = {}
 
   doValidate: (str)->
-    @result.error = err_msg if not validator.isNull(str)
+    @result.error = err_msg if not validators.isNull(str)
     return @result
     
 
