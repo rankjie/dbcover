@@ -134,6 +134,11 @@ class Model
     # 这些具体问题交给QueryTable处理
     queryTable.find(rawSQL, condition)
 
+  count: ->
+    queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl
+    queryTable.count()
+
+
 exports.Model   = Model
 exports.Observe = new Observe
 exports.Validators = Validators

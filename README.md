@@ -99,6 +99,8 @@ promise = user.update()
 # Deleting instance 
 promise = user.delete()
 
+# Count rows
+promise = user.count()
 
 
 # Query 

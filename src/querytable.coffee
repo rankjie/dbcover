@@ -23,6 +23,16 @@ class QueryTable
     @_queryType = 'find'
     return @
 
+  count: ->
+    sql = "SELECT COUNT('#{@nameToField[Object.keys(@nameToField)[0]]['column']}') AS count FROM #{@table}"
+
+    defer = Q.defer()
+    @db.query sql, (err, data)->
+      return defer.reject(err) if err?
+      defer.resolve data[0]['count']
+
+    return defer.promise
+
   set: (args) ->
     @_args = args
     return @
