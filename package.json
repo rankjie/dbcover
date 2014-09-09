@@ -1,6 +1,6 @@
 {
   "name": "dbcover",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "A Promise/A+ Based Object Relational Mapping Module With Cache(Memcached/Redis) Enabled For Mysql/PostgreSQL/more. [under development]",
   "main": "lib/model.js",
   "scripts": {

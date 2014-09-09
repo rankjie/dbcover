@@ -116,7 +116,7 @@ class Model
               for result in arguments
                 re = re.concat result if toType(result) is 'array'
                 re.push result if toType(result) is 'object'
-              Q.resolve re
+              Q(re)
       )(key, @)
 
   # 生产instance

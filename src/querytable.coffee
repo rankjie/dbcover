@@ -94,7 +94,7 @@ class QueryTable
       @_fieldsToUpdate.push 
         column : field.column
         value  : field.toDB(obj[name])
-    return Q.resolve() if @_fieldsToUpdate.length is 0
+    return Q() if @_fieldsToUpdate.length is 0
     # 取出一会儿要从cache里删除的key
     @_cachekey = @cacheKey(obj)
     @_objToUpdate = obj
