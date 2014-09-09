@@ -49,6 +49,7 @@ class Model
     @$cache      = false
     @$cache      = cacheGroup[dataDefine.meta.cache] or cacheGroup['default'] if dataDefine.meta.cache
     
+    @debug       = false
 
     @$nameToField = {} 
     for f in dataDefine.meta.fields
@@ -126,7 +127,7 @@ class Model
 
   find: (rawSQL, condition) ->
     # 同new
-    queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl
+    queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl, @debug
     # 传入的参数有三种情况：
     # 'age > ? and created > ?', [30, 234242]
     # 'age > :age and created > :created'
@@ -135,8 +136,10 @@ class Model
     queryTable.find(rawSQL, condition)
 
   count: ->
-    queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl
+    queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl, @debug
     queryTable.count()
+
+  debug: (@debug)->
 
 
 exports.Model   = Model

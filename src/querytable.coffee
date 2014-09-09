@@ -6,15 +6,14 @@ Q             = require 'q'
 replace_char = '?'
 prefix       = ':'
 
+old_console_log = console.log 
 
 class QueryTable
-  constructor: (table, db, cache, model, nameToField, ttl) ->
-    @db          = db
-    @cache       = cache
-    @table       = table
+  constructor: (@table, @db, @cache, model, @nameToField, @ttl, @_debug) ->
     @model       = model ? null
-    @nameToField = nameToField
-    @ttl         = ttl
+
+  @debug = -> old_console_log.apply(this, arguments)  if @_debug
+
   # 只有model才有的方法
   find: (inputRawSQL, condition) ->
     # SELECT id,name,mail..... FROM users
@@ -168,14 +167,14 @@ class QueryTable
     # if @_condition?
     #   s = sql.toString()
     #   for i in [0...s.match(/\?/g).length] by 1
-    #     console.log @_condition[i]
+    #     @debug @_condition[i]
     #     s = s.substr(0, s.indexOf replace_char) + "#{@_condition[i]}" + s.substr(s.indexOf(replace_char) + replace_char.length)
     # else if @_args?
     #   for k, v of @_args
     #     s = s.replace prefix+k, "#{v}"
 
 
-    # console.log '最后执行的sql：'+sql.toString()
+    # @debug '最后执行的sql：'+sql.toString()
     return sql.toString()
 
   # deferred.reject err if err 需要改一下。
@@ -186,7 +185,7 @@ class QueryTable
     sql = self.toSQL()
 
     cacheToInstance = (rows) ->
-      console.log '[dbcover] Found data in cache.'
+      @debug '[dbcover] Found data in cache.'
       instances = []
       for row in JSON.parse rows
         for name, field of self.nameToField
@@ -195,11 +194,11 @@ class QueryTable
       return instances
 
     instanceToCache = (obj) ->
-      # console.log obj.$cacheData
+      # @debug obj.$cacheData
       return JSON.stringify obj.$cacheData
 
     dbToInstance = (rows) ->
-      console.log '[dbcover] Load data from DB.'
+      @debug '[dbcover] Load data from DB.'
       instances = []
       for row in rows
         for name, field of self.nameToField
@@ -212,8 +211,8 @@ class QueryTable
       cacheKey = sql.replace(/\s+/g, '')
       # 看是否有cache定义
       if self.cache
-        # console.log '有定义cache哦！'
-        # console.log self
+        # @debug '有定义cache哦！'
+        # @debug self
         # 先从cache找
         self.cache.get cacheKey, (err, data)->
           # 出错
@@ -222,11 +221,11 @@ class QueryTable
           # memcached这里有个bug(?)，如果查不到对应的key，会返回一个很奇怪的对象（包含一个叫$family等的东西，所以这样粗糙hack一下）
           # need further fix
           if _.isEmpty(data) or data.$family?
-            # console.log 'cache查到的是空的'
+            # @debug 'cache查到的是空的'
             # 从db查
             self.db.query sql, self._condition ? self._args, (err, rows) ->
               if err?
-                # console.log 'db查的时候  出错了'
+                # @debug 'db查的时候  出错了'
                 deferred.reject err
               else
                 if rows.length > 0
@@ -249,7 +248,7 @@ class QueryTable
         # 直接从db找
         self.db.query sql, self._condition ? self._args, (err, rows) ->
           if err?
-            # console.log 'db查的时候  出错了'
+            # @debug 'db查的时候  出错了'
             deferred.reject err
           else
             deferred.resolve if self._first then dbToInstance(rows)[0] else dbToInstance(rows)
