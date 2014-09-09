@@ -185,7 +185,7 @@ class QueryTable
     sql = self.toSQL()
 
     cacheToInstance = (rows) ->
-      @debug '[dbcover] Found data in cache.'
+      self.debug '[dbcover] Found data in cache.'
       instances = []
       for row in JSON.parse rows
         for name, field of self.nameToField
@@ -198,7 +198,7 @@ class QueryTable
       return JSON.stringify obj.$cacheData
 
     dbToInstance = (rows) ->
-      @debug '[dbcover] Load data from DB.'
+      self.debug '[dbcover] Load data from DB.'
       instances = []
       for row in rows
         for name, field of self.nameToField
