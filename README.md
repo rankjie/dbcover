@@ -82,6 +82,9 @@ User = new Model
       deferred.resolve result
     return deferred.promise
 
+# Turn on debug, default is false
+User.debug(true)
+
 # Creating instance
 user = User.new
   userId: 23
