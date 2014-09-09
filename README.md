@@ -83,7 +83,7 @@ User = new Model
     return deferred.promise
 
 # Turn on debug, default is false
-User.debug(true)
+User.turnOnDebug(true)
 
 # Creating instance
 user = User.new
