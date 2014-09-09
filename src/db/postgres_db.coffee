@@ -8,7 +8,7 @@ class Postgres
     @pool = pg.pools.getOrCreate config
 
   query: (sql, args, callback) ->
-    console.log '[dbcover]', args
+    console.log '[dbcover]', args if @debug
     replaceAll = (find, replace, str) ->
       str.replace(new RegExp(find, 'g'), replace);
     if Object.prototype.toString.call(args) is '[object Array]'
@@ -19,8 +19,8 @@ class Postgres
         sql = sql.replace prefix+k, "'#{v}'"
     sql = replaceAll '`', '"', sql
     callback = args if not callback?
-    console.log '[dbcover]', sql
-    console.log '[dbcover]', args
+    console.log '[dbcover]', sql if @debug
+    console.log '[dbcover]', args if @debug
     @pool.connect (err, client, done)->
       if err
         return console.error('[dbcover] Error when getting PostgreSQL connection', err)

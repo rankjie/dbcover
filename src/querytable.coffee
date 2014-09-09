@@ -26,6 +26,7 @@ class QueryTable
     sql = "SELECT COUNT('#{@nameToField[Object.keys(@nameToField)[0]]['column']}') AS count FROM #{@table}"
 
     defer = Q.defer()
+    @db.debug = @_debug
     @db.query sql, (err, data)->
       return defer.reject(err) if err?
       defer.resolve data[0]['count']
@@ -179,10 +180,12 @@ class QueryTable
 
   # deferred.reject err if err 需要改一下。
   # 因为err了就不用后面的操作了，直接return吧
-  query: () ->  
+  query: () ->
     self = @
     deferred = Q.defer()
     sql = self.toSQL()
+
+    self.db.debug = @_debug
 
     cacheToInstance = (rows) ->
       self.debug '[dbcover] Found data in cache.'
