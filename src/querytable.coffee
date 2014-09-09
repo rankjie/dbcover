@@ -12,7 +12,7 @@ class QueryTable
   constructor: (@table, @db, @cache, model, @nameToField, @ttl, @_debug) ->
     @model       = model ? null
 
-  @debug = -> old_console_log.apply(this, arguments)  if @_debug
+  debug: -> old_console_log.apply(this, arguments)  if @_debug
 
   # 只有model才有的方法
   find: (inputRawSQL, condition) ->
