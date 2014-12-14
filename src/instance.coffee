@@ -30,20 +30,22 @@ class Instance
     validationResult = @validate()
     self = @
     unless validationResult.error?
-      return queryTable.save(@)
+      queryTable.save(@)
+      .then (result)->
+        Q(self)
+      , (err)->
+        Q.reject err
     else
-      return Q.reject validationResult.error
+      Q.reject validationResult.error
 
   update: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToFieldm, @$ttl
     validationResult = @validate()
-    # deferred = Q.defer()
     unless validationResult.error?
       return queryTable.update(@)
     else
       console.log 'valid>>>>>>>', validationResult.error
       return Q.reject validationResult.error
-    # return deferred.promise
 
   delete: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField, @$ttl

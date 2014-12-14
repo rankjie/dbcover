@@ -128,9 +128,10 @@ class Model
   new: (vals)->
     new Instance @$table, @$indices, @$nameToField, vals, @$repo, @$cache, @$userDefineMethods, @primkeys, @$ttl
 
-  find: (rawSQL, condition) ->
+  find: (rawSQL, condition, options) ->
     # 同new
     queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl, @debug
+    queryTable.withCache = options?.withCache
     # 传入的参数有三种情况：
     # 'age > ? and created > ?', [30, 234242]
     # 'age > :age and created > :created'
