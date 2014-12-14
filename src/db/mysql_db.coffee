@@ -9,8 +9,9 @@ class MySQL
   
   query: (sql, args, callback) ->
     @pool.getConnection (err, connection)=>
-      if err
-        console.log '[dbcover] Error when getting MySQL connection:'+err if @debug
+      if err or not connection?
+        console.log '[dbcover] Error when getting MySQL connection:'+ err or 'got no connection' if @debug
+        return callback err or 'can not get connection', null
       if Object.prototype.toString.call(args) == '[object Array]'
         console.log '[dbcover]', sql if @debug
         console.log '[dbcover]', args if @debug
