@@ -105,6 +105,9 @@ promise = user.delete()
 # Count rows
 promise = user.count()
 
+# Count rows with WHERE age > 30
+promise = user.count("age > 30")
+
 
 # Query 
 # All promises returned by Query or findBy, will be resolved with a set of instances ( first() and findByIndeices which has `uniq:true` will return just one object )

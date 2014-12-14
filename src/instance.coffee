@@ -27,44 +27,27 @@ class Instance
   
   save: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField, @$ttl
-    deferred = Q.defer()
     validationResult = @validate()
     self = @
     unless validationResult.error?
-      # 没有error就认为没有出错
-      queryTable.save(@)
-      .then (result)->
-        deferred.resolve self
-      , (err)->
-        deferred.reject err
+      return queryTable.save(@)
     else
-      deferred.reject validationResult.error
-    return deferred.promise
+      return Q.reject validationResult.error
 
   update: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToFieldm, @$ttl
     validationResult = @validate()
-    deferred = Q.defer()
+    # deferred = Q.defer()
     unless validationResult.error?
-      queryTable.update(@) 
-      .then (result)->
-        deferred.resolve result
-      , (err)->
-        deferred.reject err
+      return queryTable.update(@)
     else
       console.log 'valid>>>>>>>', validationResult.error
-      deferred.reject validationResult.error
-    return deferred.promise
+      return Q.reject validationResult.error
+    # return deferred.promise
 
   delete: ->
     queryTable = new QueryTable @$table, @$db, @$cache, null, @$nameToField, @$ttl
-    deferred = Q.defer()
-    queryTable.delete(@)
-    .then (result)->
-      deferred.resolve result
-    , (err)->
-      deferred.reject err
-    return deferred.promise
+    return queryTable.delete(@)
 
   # indices(pks)要检查是否为空
   validate: ->

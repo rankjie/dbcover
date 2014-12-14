@@ -18,6 +18,7 @@ exports.config = config =
       password: '78963214'
       database: 'test'
       connectionLimit: 4
+      charset: 'utf8mb4'
     postgres:
       host: 'localhost'
       port: 5432

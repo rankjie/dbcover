@@ -22,9 +22,8 @@ class QueryTable
     @_queryType = 'find'
     return @
 
-  count: ->
-    sql = "SELECT COUNT('#{@nameToField[Object.keys(@nameToField)[0]]['column']}') AS count FROM #{@table}"
-
+  count: (wheres)->
+    sql = "SELECT COUNT('#{@nameToField[Object.keys(@nameToField)[0]]['column']}') AS count FROM #{@table}" + if wheres? then ' where ' + wheres else ''
     defer = Q.defer()
     @db.debug = @_debug
     @db.query sql, (err, data)->
@@ -148,14 +147,17 @@ class QueryTable
     else if @_queryType is 'update'
       sql = sqlbuilder.update().table(@table)
       for f in @_fieldsToUpdate
+        if f.value? and toType(f.value) is 'string'
+          f.value = f.value.replace(/'/g, "\\'")
         sql = sql.set f.column, f.value
       for str in @pkStr
         sql = sql.where(str)
 
-
     else if @_queryType is 'insert'
       sql = sqlbuilder.insert().into(@table)
       for f in @_fieldsToInsert
+        if f.value? and toType(f.value) is 'string'
+          f.value = f.value.replace(/'/g, "\\'")
         sql = sql.set f.column, f.value ? null
 
     else if @_queryType is 'delete'

@@ -53,13 +53,13 @@ fieldTypes['string'] = class StringField extends Field
 
 fieldTypes['boolean'] = class StringField extends Field
   toDB: (val) ->
-    if val is 'true' or val is true
-      return 'true'
+    if val
+      return 1
     else
-      return 'false'
+      return 0
 
   fromDB: (val) ->
-    if val is 'true' or val is true
+    if val is 1
       return true 
     else
       return false

@@ -138,9 +138,9 @@ class Model
     # 这些具体问题交给QueryTable处理
     queryTable.find(rawSQL, condition)
 
-  count: ->
+  count: (where_str)->
     queryTable = new QueryTable @$table, @$repo, @$cache, @, @$nameToField, @$ttl, @debug
-    queryTable.count()
+    queryTable.count(where_str)
 
 
 exports.Model   = Model
