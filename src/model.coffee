@@ -123,7 +123,7 @@ class Model
   # 生产instance
   # User.new
   turnOnDebug: (@debug)->
-    @$repo.debug = debug
+    @$repo.debug = @debug
 
   new: (vals)->
     new Instance @$table, @$indices, @$nameToField, vals, @$repo, @$cache, @$userDefineMethods, @primkeys, @$ttl
