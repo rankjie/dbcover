@@ -141,8 +141,8 @@ class QueryTable
         for f,i in @_orderBy
           sql = sql.order f, @_order[i]
 
-      sql = sql.limit(@_limit) if @_limit? and @_limit isnt 0
-      sql = sql.offset(@_offset) if @_offset?
+      sql = sql.limit(@_limit) if @_limit
+      sql = sql.offset(@_offset) if @_offset
     
     else if @_queryType is 'update'
       sql = sqlbuilder.update().table(@table)
