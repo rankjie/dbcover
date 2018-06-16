@@ -12,7 +12,7 @@ class QueryTable
   constructor: (@table, @db, @cache, model, @nameToField, @ttl, @_debug) ->
     @model       = model ? null
 
-  debug: -> old_console_log.apply(this, arguments)  if @_debug
+  debug: -> old_console_log.apply(this, arguments) if @_debug
 
   # 只有model才有的方法
   find: (inputRawSQL, condition) ->
@@ -40,7 +40,7 @@ class QueryTable
     @_orderBy = []
     @_order   = []
     @_orderBy.push args
-    _order     = if order.toUpperCase() is 'DESC' then false else true
+    _order     = order.toUpperCase() isnt 'DESC'
     @_order.push _order
     return @
 
@@ -51,9 +51,7 @@ class QueryTable
     @_first = true
     @list 0, 1
 
-  list: (offset, limit) ->
-    @_offset = offset or 0
-    @_limit = limit
+  list: (@offset, @limit) ->
     @query()
 
   save: (obj)->
@@ -116,7 +114,7 @@ class QueryTable
       for name, field of @nameToField
         sql = sql.field(field.column, name)
 
-      if not @_inputRawSQL? 
+      if not @_inputRawSQL?
         sql = sql
       else if toType(@_inputRawSQL) is 'string'
         sql = sql.where(@_inputRawSQL)
@@ -125,7 +123,7 @@ class QueryTable
           # 传入的参数
           # userId: 123  或者  userId__gt: 123
           # userId并不是column name，所以要转换一下
-          operators = 
+          operators =
             '__gt' : ' > '
             '__lt' : ' < '
           opkey = k.slice(k.length-4, k.length)
