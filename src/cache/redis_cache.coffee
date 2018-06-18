@@ -1,5 +1,6 @@
-redis = require 'redis'
+redis = require 'ioredis'
 _     = require 'lodash'
+Q     = require 'q'
 
 class redisMethods
   constructor: (_config)->
@@ -9,40 +10,31 @@ class redisMethods
     delete config.host
     delete config.port
     _options = config or null
-    @client = redis.createClient _port, _host, _options
+    @client = new redis(_port, _host, _options)
 
-  set: (key, row, ttl, callback) ->
-    if Object.prototype.toString.call(ttl) is '[object Function]' or ttl < 1
-      callback = ttl if Object.prototype.toString.call(ttl) is '[object Function]'
-      @client.set key, row, (err, replies)->
-        callback err, replies if callback
+  set: (key, row, ttl) ->
+    if not ttl
+      @client.set key, row
     else
-      multi = @client.multi([
-        ['set', key, row],
-        ['expire', [key, ttl]]
-      ]).exec (err, replies)->
-        callback err,replies if callback
+      @client.set key, row, 'EX', ttl
 
-  get: (keys, callback) ->
-    arr = []
+  get: (keys) ->
+    arr = keys
     if Object.prototype.toString.call(keys) isnt '[object Array]'
-      arr.push keys
-    else
-      arr = keys
+      arr = [keys]
     arrayToObj = (keys, vals) ->
       obj = {}
-      for key, i in keys when vals[i] isnt null
+      for key, i in keys when vals[i]?
         obj[key] = vals[i]
       return obj
-    @client.mget arr, (err, rows) ->
-      callback err, arrayToObj arr, rows
+    @client.mget arr
+    .then (rows)->
+      Q(arrayToObj arr, rows)
 
   del: (keys, callback) ->
-    @client.del keys, (err, number_of_rows_deleted) ->
-      callback err, number_of_rows_deleted  if callback
+    @client.del keys
   
   end: ->
     @client.quit()
-
 
 module.exports = redisMethods

@@ -35,8 +35,6 @@ class Observe
   endAll: ->
     @endCacheAll()
     @endRepoAll()
-    
-    
 
 class Model
   # 生产Model
@@ -105,7 +103,8 @@ class Model
             values = {}
             if toType(v) isnt 'object' then values[key.name] = v else values = v
             sqlStr = []
-            sqlStr.push self.$nameToField[name].column + " = '" + self.$nameToField[name].toDB values[name] + "'" for name in key.keyName
+            for name in key.keyName
+              sqlStr.push self.$nameToField[name].column + " = '" + self.$nameToField[name].toDB values[name] + "'"
             return self.find(sqlStr.join(' AND ')).first() if self.$nameToField[name].uniq
             self.find(sqlStr.join(' AND ')).all()
             

@@ -53,7 +53,6 @@ class Instance
 
   # indices(pks)要检查是否为空
   validate: ->
-    deferred = Q.defer()
     result = {}
     if @$pks?
       for index in @$pks

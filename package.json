@@ -1,6 +1,6 @@
 {
   "name": "dbcover",
-  "version": "0.6.0",
+  "version": "0.6.3",
   "description": "A Promise/A+ Based Object Relational Mapping Module With Cache(Memcached/Redis) Enabled For Mysql/PostgreSQL/more. [under development]",
   "main": "lib/model.js",
   "scripts": {
@@ -14,13 +14,13 @@
     "cache"
   ],
   "author": "Leijie Hou",
-  "license": "BSD",
+  "license": "UNLICENSED",
   "dependencies": {
-    "pg":"*",
-    "mysql":"*",
-    "redis":"*",
-    "squel":"*",
-    "lodash":"*",
-    "q":"*"
+    "lodash": "4.17.10",
+    "mysql2": "^1.5.3",
+    "pg": "*",
+    "q": "*",
+    "ioredis": "*",
+    "squel": "*"
   }
 }

@@ -10,7 +10,7 @@ old_console_log = console.log
 
 class QueryTable
   constructor: (@table, @db, @cache, model, @nameToField, @ttl, @_debug) ->
-    @model       = model ? null
+    @model = model ? null
 
   debug: -> old_console_log.apply(this, arguments) if @_debug
 
@@ -24,13 +24,10 @@ class QueryTable
 
   count: (wheres)->
     sql = "SELECT COUNT('#{@nameToField[Object.keys(@nameToField)[0]]['column']}') AS count FROM #{@table}" + if wheres? then ' where ' + wheres else ''
-    defer = Q.defer()
     @db.debug = @_debug
-    @db.query sql, (err, data)->
-      return defer.reject(err) if err?
-      defer.resolve data[0]['count']
-
-    return defer.promise
+    @db.query sql
+    .then (data)->
+      Q(data[0]['count'])
 
   set: (args) ->
     @_args = args
@@ -178,11 +175,16 @@ class QueryTable
     # @debug '最后执行的sql：'+sql.toString()
     return sql.toString()
 
-  # deferred.reject err if err 需要改一下。
   # 因为err了就不用后面的操作了，直接return吧
-  query: () ->
+  query: ->
     self = @
-    deferred = Q.defer()
+    try
+      return await self.queryWrapped()
+    catch e
+      Q.reject(e)
+
+  queryWrapped: ->
+    self = @
     sql = self.toSQL()
 
     self.db.debug = @_debug
@@ -213,94 +215,59 @@ class QueryTable
     if self._queryType is 'find'
       cacheKey = sql.replace(/\s+/g, '')
       # 看是否有cache定义
+      
+      # @debug '有定义cache哦！'
+      # @debug self
+      # 先从cache找
       if self.cache
-        # @debug '有定义cache哦！'
-        # @debug self
-        # 先从cache找
-        self.cache.get cacheKey, (err, data)->
-          # 出错
-          deferred.reject err if err
-          # cache没有
-          # memcached这里有个bug(?)，如果查不到对应的key，会返回一个很奇怪的对象（包含一个叫$family等的东西，所以这样粗糙hack一下）
-          # need further fix
-          if _.isEmpty(data) or data.$family?
-            # @debug 'cache查到的是空的'
-            # 从db查
-            self.db.query sql, self._condition ? self._args, (err, rows) ->
-              if err?
-                # @debug 'db查的时候  出错了'
-                deferred.reject err
-              else
-                if rows.length > 0
-                  datas = dbToInstance rows
-                  # 先把sql作为key，存入cache
-                  self.cache.set cacheKey, JSON.stringify(rows), self.ttl, (err, response) ->
-                    # 把每个查到的对象都存入cache
-                    for obj in datas
-                      self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), self.ttl
-                    deferred.resolve if self._first then datas[0] else datas
-                else
-                  deferred.resolve null
-          # cache有的话
-          else
-            d = cacheToInstance data[cacheKey]
-            d = d[0] if self._first
-            deferred.resolve d
-      # 没设置cache的话
-      else
-        # 直接从db找
-        self.db.query sql, self._condition ? self._args, (err, rows) ->
-          if err?
-            # @debug 'db查的时候  出错了'
-            deferred.reject err
-          else
-            deferred.resolve if self._first then dbToInstance(rows)[0] else dbToInstance(rows)
-
+        data = await self.cache.get cacheKey
+      # cache没有
+      # memcached这里有个bug(?)，如果查不到对应的key，会返回一个很奇怪的对象（包含一个叫$family等的东西，所以这样粗糙hack一下）
+      # need further fix
+        if not (_.isEmpty(data) or data.$family?)
+          d = cacheToInstance data[cacheKey]
+          return Q(d[0]) if self._first
+          return Q(d)
+      # @debug 'cache查到的是空的'
+      # 从db查
+      rows = await self.db.query sql, self._condition ? self._args
+      rows = rows[0]
+      return Q(null) if rows.length <= 0
+      datas = dbToInstance rows
+      # 先把sql作为key，存入cache
+      if self.cache
+        self.cache.set cacheKey, JSON.stringify(rows), self.ttl
+        for obj in datas
+          self.cache.set self.cacheKey(obj), JSON.stringify(self.cacheDate(obj)), self.ttl
+      return Q(datas[0]) if self._first
+      return Q(datas)
     # insert类型
     if self._queryType is 'insert'
-      
       # 存入db
-      self.db.query sql, (err, rows) ->
-        if err
-          deferred.reject err
-          return deferred.promise
-
-        # 取出auto的ID
-        for name in self._auto
-          self._objToSave[name]                  = rows.insertId
-          self._objToSave.$nameToField[name].val = rows.insertId
-          self._cacheData[name]                  = self._objToSave.$nameToField[name].toDB self._objToSave[name]
-        if self.cache
-          # 存入cache
-          self.cache.set self.cacheKey(self._objToSave), JSON.stringify(self._cacheData), self.ttl, (err, response) ->
-            deferred.reject rows if err?
-            deferred.resolve rows
-        else
-          deferred.resolve rows
-
+      rows = await self.db.query sql
+      rows = rows[0]
+      # 取出auto的ID
+      for name in self._auto
+        self._objToSave[name]                  = rows.insertId
+        self._objToSave.$nameToField[name].val = rows.insertId
+        self._cacheData[name]                  = self._objToSave.$nameToField[name].toDB self._objToSave[name]
+      if self.cache
+        # 存入cache
+        self.cache.set self.cacheKey(self._objToSave), JSON.stringify(self._cacheData), self.ttl
+      Q(rows)
+        
     # update类型，更新完db后从cache里删除该对象数据
     if self._queryType is 'delete'
-      self.db.query sql, (err, rows) ->
-        deferred.reject err if err
-        if self.cache
-          self.cache.del self._cachekey, (err, numberOfRowsDeleted) ->
-            deferred.reject err if err
-            deferred.resolve true
-        else
-          deferred.resolve true
+      await self.db.query sql
+      if self.cache
+        self.cache.del self._cachekey
+      Q(true)
 
     if self._queryType is 'update'
-      self.db.query sql, (err, rows) ->
-        deferred.reject err if err
-        if self.cache
-          # 从cache里删掉，以后要用的时候再取就是了
-          self.cache.del self._cachekey, (err, response) ->
-            deferred.reject err if err
-            deferred.resolve self._objToUpdate
-        else
-          deferred.resolve self._objToUpdate
-
-    return deferred.promise
+      await self.db.query sql
+      if self.cache
+        self.cache.del self._cachekey
+      Q(self._objToUpdate)
 
   cacheKey: (obj) ->
     key = "#{@table}:"
