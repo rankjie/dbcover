@@ -16,14 +16,20 @@ class MySQL
     if @debug
       console.log '[dbcover]', sql
       console.log '[dbcover]', args
-    if Object.prototype.toString.call(args) == '[object Array]'
-      self.pool.execute sql, args
-    else if Object.prototype.toString.call(args) == '[object Object]'
-      for k, v of args
-        sql = sql.replace prefix + k, connection.escape("`#{v}`")
-      self.pool.execute sql
-    else
-      self.pool.execute sql
+    
+    self.pool.getConnection()
+    .then (connection)->
+      if Object.prototype.toString.call(args) == '[object Array]'
+          res = connection.query sql, args
+          return res
+      else if Object.prototype.toString.call(args) == '[object Object]'
+        for k, v of args
+          sql = sql.replace prefix + k, connection.escape("`#{v}`")        
+      res = connection.query sql
+      return res
+      res.then (ret)->
+        connection.release()
+        Q(ret)
 
   end: ->
     @pool.end()
