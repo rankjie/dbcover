@@ -21,12 +21,11 @@ class MySQL
     .then (connection)->
       if Object.prototype.toString.call(args) == '[object Array]'
           res = connection.query sql, args
-          return res
-      else if Object.prototype.toString.call(args) == '[object Object]'
-        for k, v of args
-          sql = sql.replace prefix + k, connection.escape("`#{v}`")        
-      res = connection.query sql
-      return res
+      else
+        if Object.prototype.toString.call(args) == '[object Object]'
+          for k, v of args
+            sql = sql.replace prefix + k, connection.escape("`#{v}`")        
+        res = connection.query sql
       res.then (ret)->
         connection.release()
         Q(ret)
