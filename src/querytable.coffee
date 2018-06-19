@@ -27,7 +27,7 @@ class QueryTable
     @db.debug = @_debug
     @db.query sql
     .then (data)->
-      Q(data[0]['count'])
+      Q(data[0][0].count)
 
   set: (args) ->
     @_args = args
