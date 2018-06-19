@@ -27,7 +27,7 @@ class QueryTable
     @db.debug = @_debug
     @db.query sql
     .then (data)->
-      Q(data[0][0].count)
+      Q(data[0].count)
 
   set: (args) ->
     @_args = args
@@ -231,7 +231,6 @@ class QueryTable
       # @debug 'cache查到的是空的'
       # 从db查
       rows = await self.db.query sql, self._condition ? self._args
-      rows = rows[0]
       return Q(null) if rows.length <= 0
       datas = dbToInstance rows
       # 先把sql作为key，存入cache
@@ -245,7 +244,6 @@ class QueryTable
     if self._queryType is 'insert'
       # 存入db
       rows = await self.db.query sql
-      rows = rows[0]
       # 取出auto的ID
       for name in self._auto
         self._objToSave[name]                  = rows.insertId

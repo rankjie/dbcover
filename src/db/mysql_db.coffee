@@ -28,7 +28,7 @@ class MySQL
         res = connection.query sql
       res.then (ret)->
         connection.release()
-        Q(ret)
+        Q(ret[0])
 
   end: ->
     @pool.end()
