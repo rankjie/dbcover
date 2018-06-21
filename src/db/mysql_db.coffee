@@ -30,6 +30,7 @@ class MySQL
         Q(ret[0])
       , (e)->
         connection.release()
+        e.args = arguments
         Q.reject(e)
       
   end: ->
