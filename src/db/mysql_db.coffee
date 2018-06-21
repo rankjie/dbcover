@@ -29,6 +29,12 @@ class MySQL
       res.then (ret)->
         connection.release()
         Q(ret[0])
+      , (e)->
+        connection.release()
+        Q.reject(e)
+    .catch (e)->
+      console.error '[dbcover]', e
+      Q.reject(e)
 
   end: ->
     @pool.end()
