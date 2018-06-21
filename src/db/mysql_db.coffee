@@ -16,7 +16,6 @@ class MySQL
     if @debug
       console.log '[dbcover]', sql
       console.log '[dbcover]', args
-    
     self.pool.getConnection()
     .then (connection)->
       if Object.prototype.toString.call(args) == '[object Array]'
@@ -32,10 +31,7 @@ class MySQL
       , (e)->
         connection.release()
         Q.reject(e)
-    .catch (e)->
-      console.error '[dbcover]', e
-      Q.reject(e)
-
+      
   end: ->
     @pool.end()
 
