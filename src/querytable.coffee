@@ -48,7 +48,7 @@ class QueryTable
     @_first = true
     @list 0, 1
 
-  list: (@offset, @limit) ->
+  list: (@_offset, @_limit)->
     @query()
 
   save: (obj)->
