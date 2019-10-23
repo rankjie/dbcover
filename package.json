@@ -16,7 +16,7 @@
   "author": "rankjie",
   "license": "UNLICENSED",
   "dependencies": {
-    "lodash": "4.17.10",
+    "lodash": "4.17.13",
     "mysql2": "^1.5.3",
     "pg": "*",
     "q": "*",
