@@ -51,7 +51,7 @@ fieldTypes['string'] = class StringField extends Field
   defaultValue: ->
     return ''
 
-fieldTypes['boolean'] = class StringField extends Field
+fieldTypes['boolean'] = class BoolenField extends Field
   toDB: (val) ->
     if val
       return 1
@@ -59,10 +59,7 @@ fieldTypes['boolean'] = class StringField extends Field
       return 0
 
   fromDB: (val) ->
-    if val is 1
-      return true 
-    else
-      return false
+    return Number(val) is 1
 
   defaultValue: ->
     return null
@@ -70,15 +67,15 @@ fieldTypes['boolean'] = class StringField extends Field
 fieldTypes['timestamp'] = class TimestampField extends Field
   toDB: (val) ->
     if not val?
-      return val;
-    try 
+      return val
+    try
       return (new Date(val)).toISOString()
     catch e
       return null
 
   fromDB: (val) ->
     if not val?
-      return val;
+      return val
     try
       return (new Date(val))
     catch e
@@ -91,7 +88,7 @@ fieldTypes['json'] = class JSONField extends Field
   
   fromDB: (val) ->
     return val if not val?
-    try 
+    try
       return JSON.parse val
     catch e
       return val
