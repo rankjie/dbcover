@@ -26,7 +26,7 @@ fieldTypes['integer'] = class IntegerField extends Field
     return val
 
   fromDB: (val) ->
-    return val
+    return Number(val)
 
   defaultValue: ->
     return 0
@@ -36,7 +36,7 @@ fieldTypes['number'] = class NumberField extends Field
     return val
 
   fromDB: (val) ->
-    return val
+    return Number(val)
 
   defaultValue: ->
     return 0
