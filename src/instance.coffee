@@ -79,4 +79,8 @@ class Instance
       vals[name] = @[name]
     return vals
 
+  toJSON: ->
+    return @getVals()
+    
+
 module.exports = Instance
