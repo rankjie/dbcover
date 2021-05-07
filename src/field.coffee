@@ -9,9 +9,7 @@ class Field
     @primkey   = attrs.primkey ? false
     @auto      = attrs.auto ? false
     @uniq      = attrs.uniq ? false
-
-  say: ->
-    console.log '喵'
+    @default   = attrs.default
 
   toDB: (val) ->
     return val
@@ -55,14 +53,13 @@ fieldTypes['boolean'] = class BoolenField extends Field
   toDB: (val) ->
     if val
       return 1
-    else
-      return 0
+    return 0
 
   fromDB: (val) ->
     return Number(val) is 1
 
   defaultValue: ->
-    return null
+    return 0
 
 fieldTypes['timestamp'] = class TimestampField extends Field
   toDB: (val) ->
@@ -80,6 +77,9 @@ fieldTypes['timestamp'] = class TimestampField extends Field
       return (new Date(val))
     catch e
       return null
+  
+  defaultValue: ->
+    return (new Date()).toISOString()
 
 fieldTypes['json'] = class JSONField extends Field
   toDB: (val) ->
