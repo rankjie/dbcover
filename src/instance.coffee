@@ -14,12 +14,15 @@ class Instance
     @$cache       = cache
     @$primkeys    = primkeys
     @$ttl         = ttl
-    
+
     for name, field of @$nameToField
       # 按照name把键值都存下来，只能透过name访问，不能直接用column来访问
       # 同时也把这个初始值存到field里面，update的时候就能用了
-      @[name] = _.cloneDeep vals[name]
-      field.val = _.cloneDeep vals[name]
+      thisVal = vals[name]
+      if thisVal is undefined and field.default?
+        thisVal = field.default
+      @[name] = _.cloneDeep thisVal
+      field.val = _.cloneDeep thisVal
 
     # 添加用户定义的方法
     for method in userDefineMethods
