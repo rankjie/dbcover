@@ -1,5 +1,6 @@
 sqlbuilder    = require 'squel'
 _             = require 'lodash'
+equal = require 'fast-deep-equal'
 Q             = require 'q'
 {toType}      = require './utils'
 
@@ -82,10 +83,10 @@ class QueryTable
       for name in k.keyName
         @pkStr.push obj.$nameToField[name].column + " = '" + obj.$nameToField[name].val + "'" if obj.$nameToField[name].val? and obj.$nameToField[name].val isnt ''
     # 找出需要做update的数据
-    for name, field of obj.$nameToField when not _.isEqual(obj[name], field.val)
+    for name, field of obj.$nameToField when not equal(obj[name], field.val)
       # 更新field.val为最新的值
-      field.val = obj[name]
-      @_fieldsToUpdate.push 
+      field.val = _.cloneDeep obj[name]
+      @_fieldsToUpdate.push
         column : field.column
         value  : field.toDB(obj[name])
     return Q() if @_fieldsToUpdate.length is 0
